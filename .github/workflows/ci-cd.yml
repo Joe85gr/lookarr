@@ -1,0 +1,8 @@
+name: Python package
+
+on: [push]
+
+jobs:
+
+  test:
+    uses: ./.github/workflows/_test.yml
