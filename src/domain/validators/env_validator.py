@@ -12,4 +12,4 @@ class EnvValidator(BaseValidator):
         for envKey in requiredEnv:
             if environ.get(envKey) is None:
                 self.is_valid = False
-                self.reasons.append(f"missing env {envKey}")
+                self.reasons.append(envKey)
