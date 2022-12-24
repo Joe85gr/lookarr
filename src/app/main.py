@@ -11,18 +11,20 @@ from src.domain.validators.env_validator import EnvValidator
 from src.infrastructure.sqlite import Database
 from src.logger import Log
 
-Database.initialise()
-env = EnvValidator()
-env.verify_required_env_variables_exist()
-if not env.is_valid:
-    raise ValidationError(
-        f"Unable to start app as the following required env variables are missing: {''.join(env.reasons)}")
-
 logger = Log.get_logger(__name__)
 config = ConfigLoader.set_config()
 auth = Auth(Database())
 
 commands = Commands(logger, auth, config)
+
+
+def initialise() -> None:
+    Database.initialise()
+    env = EnvValidator()
+    env.verify_required_env_variables_exist()
+    if not env.is_valid:
+        raise ValidationError(
+            f"Unable to start app as the following required env variables are missing: {''.join(env.reasons)}")
 
 
 def main() -> None:
@@ -42,4 +44,5 @@ def main() -> None:
 
 
 if __name__ == '__main__':
+    initialise()
     main()
