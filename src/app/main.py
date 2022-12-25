@@ -5,22 +5,21 @@ from pydantic import ValidationError
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 
 from src.app.commands.command_handlers import Commands
+from src.app.config.all_config import Config
 from src.app.config.config_loader import ConfigLoader
 from src.domain.authentication import Auth
 from src.domain.validators.env_validator import EnvValidator
 from src.infrastructure.sqlite import Database
-from src.logger import Log
 
-logger = Log.get_logger(__name__)
 config = ConfigLoader.set_config()
 auth = Auth(Database())
 
-commands = Commands(logger, auth, config)
+commands = Commands(auth, config)
 
 
-def initialise() -> None:
+def initialise(config: Config) -> None:
     Database.initialise()
-    env = EnvValidator()
+    env = EnvValidator(config.radarr.enabled)
     env.verify_required_env_variables_exist()
     if not env.is_valid:
         raise ValidationError(
@@ -44,5 +43,5 @@ def main() -> None:
 
 
 if __name__ == '__main__':
-    initialise()
+    initialise(config)
     main()

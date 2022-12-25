@@ -2,6 +2,7 @@ import os
 
 from src.domain.authentication import Auth
 from src.app.config.all_config import Config, LookarrConfig
+from src.app.config.radarr_config import RadarrConfig
 from src.infrastructure.IDatabase import IDatabase
 
 
@@ -33,7 +34,9 @@ class Test_Auth:
             search_movie_command="Movie"
         )
 
-        config = Config(lookarr=lookarrConfig)
+        radarrConfig = RadarrConfig(url=None, port=None, enabled=False)
+
+        config = Config(lookarr=lookarrConfig, radarr=radarrConfig)
 
         # Act
         result = sut.user_is_authenticated_strict(1, config)
@@ -54,7 +57,9 @@ class Test_Auth:
             search_movie_command="Movie"
         )
 
-        config = Config(lookarr=lookarrConfig)
+        radarrConfig = RadarrConfig(url=None, port=None, enabled=False)
+
+        config = Config(lookarr=lookarrConfig, radarr=radarrConfig)
 
         # Act
         result = sut.user_is_authenticated_strict(userId, config)
@@ -75,7 +80,9 @@ class Test_Auth:
             search_movie_command="Movie"
         )
 
-        config = Config(lookarr=lookarrConfig)
+        radarrConfig = RadarrConfig(url=None, port=None, enabled=False)
+
+        config = Config(lookarr=lookarrConfig, radarr=radarrConfig)
 
         # Act
         result = sut.user_is_authenticated_strict(userId, config)

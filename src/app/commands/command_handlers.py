@@ -1,4 +1,4 @@
-from logging import Logger
+from src.logger import Log
 
 from telegram import Update, InlineKeyboardMarkup
 from telegram.ext import CallbackContext, ConversationHandler
@@ -12,10 +12,9 @@ from src.domain.user import UserReply
 class Commands:
     def __init__(
             self,
-            logger: Logger,
             auth: Auth,
             config: Config):
-        self.logger = logger
+        self.logger = Log.get_logger("src.app.commands.command_handlers.Commands")
         self.auth = auth
         self.buttons = Buttons()
         self.config = config

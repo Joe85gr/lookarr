@@ -1,5 +1,4 @@
 import os
-from logging import Logger
 
 from dacite import from_dict
 import json
