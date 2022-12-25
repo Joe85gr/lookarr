@@ -1,11 +1,10 @@
 #!/usr/bin/env python
-from os import environ
+from os import environ, path, makedirs
 
 from pydantic import ValidationError
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 
 from src.app.commands.command_handlers import Commands
-from src.app.config.all_config import Config
 from src.app.config.config_loader import ConfigLoader
 from src.domain.authentication import Auth
 from src.domain.validators.env_validator import EnvValidator
@@ -17,10 +16,13 @@ auth = Auth(Database())
 commands = Commands(auth, config)
 
 
-def initialise(config: Config) -> None:
+def initialise() -> None:
+    if not path.exists("logs"):
+        makedirs("logs")
+
     Database.initialise()
-    env = EnvValidator(config.radarr.enabled)
-    env.verify_required_env_variables_exist()
+    env = EnvValidator()
+    env.verify_required_env_variables_exist(config.radarr.enabled)
     if not env.is_valid:
         raise ValidationError(
             f"Unable to start app as the following required env variables are missing: {''.join(env.reasons)}")
@@ -43,5 +45,5 @@ def main() -> None:
 
 
 if __name__ == '__main__':
-    initialise(config)
+    initialise()
     main()
