@@ -12,25 +12,22 @@ from src.logger import Log
 
 class Radarr:
     def __init__(self, config: RadarrConfig):
-        self.requests = requests
         self.logger = Log.get_logger("src.infrastructure.radarr.Radarr")
         self.config = config
 
     def search(self, title) -> list[Movie]:
         parameters = {"term": title}
         url = self.generateApiQuery("movie/lookup", parameters)
-        req = self.requests.get(url)
-        parsed_json = json.loads(req.text)
+        response = requests.get(url)
 
-        if req.status_code == 200 and parsed_json:
-            data = [from_dict(data_class=Movie, data=entry) for entry in parsed_json]
-            return data
+        if response.status_code == 200:
+            parsed_json = json.loads(response.text)
+            movies = [from_dict(data_class=Movie, data=entry) for entry in parsed_json]
+            return movies
         else:
             return []
 
-    def generateApiQuery(self, endpoint: str, parameters=None):
-        if parameters is None:
-            parameters = {}
+    def generateApiQuery(self, endpoint: str, parameters: dict):
         try:
             url = (
                     f"http://{self.config.url}:{self.config.port}/" +

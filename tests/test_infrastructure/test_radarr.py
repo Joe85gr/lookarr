@@ -1,13 +1,30 @@
+import json
 import os
+
+from dacite import from_dict
+
+from src.infrastructure.movie import Movie
 from src.infrastructure.radarr import Radarr
 from src.app.config.radarr_config import RadarrConfig
 
+url = "1.1.1.1"
+port = "7878"
+
 
 class Test_Radarr:
-    def test_search_returns_valid_response(self):
+    def test_search_returns_valid_response(self, requests_mock):
         # Arrange
-        os.environ["RADARR_API_KEY"] = "some-key"
-        config = RadarrConfig(url="10.66.66.10", port="7878", enabled=True)
+        os.environ["RADARR_API_KEY"] = "some-api-key"
+
+        with open("tests/data/radarr_valid_response.json", "r") as file:
+            rawData = file.read()
+            data = json.loads(rawData)
+            expectedResult = [from_dict(data_class=Movie, data=entry) for entry in data]
+
+        requests_mock.get(f'http://{url}:{port}/api/v3/movie/lookup?apikey=some-api-key&term=Harry%20Potter',
+                          text=rawData, status_code=200)
+
+        config = RadarrConfig(url=url, port=port, enabled=True)
         sut = Radarr(config)
         title = "Harry Potter"
 
@@ -15,4 +32,22 @@ class Test_Radarr:
         result = sut.search(title)
 
         # Assess
-        assert True is False
+        assert result == expectedResult
+
+    def test_search_returns_500(self, requests_mock):
+        # Arrange
+        os.environ["RADARR_API_KEY"] = "some-api-key"
+
+        requests_mock.get(f'http://{url}:{port}/api/v3/movie/lookup?apikey=some-api-key&term=Harry%20Potter',
+                          text="{}",
+                          status_code=500)
+
+        config = RadarrConfig(url=url, port=port, enabled=True)
+        sut = Radarr(config)
+        title = "Harry Potter"
+
+        # Act
+        result = sut.search(title)
+
+        # Assess
+        assert result == []
