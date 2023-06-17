@@ -1,5 +1,5 @@
-python-telegram-bot
-pydantic
-pyyaml
-requests
-dacite
+pydantic==1.10.9
+PyYAML==6.0
+dacite==1.8.1
+requests==2.31.0
+python-telegram-bot==13.15

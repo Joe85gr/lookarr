@@ -1,9 +1,6 @@
 import json
 import os
 
-from dacite import from_dict
-
-from src.infrastructure.movie import Movie
 from src.infrastructure.radarr import Radarr
 from src.app.config.radarr_config import RadarrConfig
 
@@ -18,10 +15,9 @@ class Test_Radarr:
 
         with open("tests/data/radarr_valid_response.json", "r") as file:
             rawData = file.read()
-            data = json.loads(rawData)
-            expectedResult = [from_dict(data_class=Movie, data=entry) for entry in data]
+            expectedResult = json.loads(rawData)
 
-        requests_mock.get(f'http://{url}:{port}/api/v3/movie/lookup?apikey=some-api-key&term=Harry%20Potter',
+        requests_mock.get(f'http://{url}:{port}/api/v3/movie/lookup?term=Harry%20Potter',
                           text=rawData, status_code=200)
 
         config = RadarrConfig(url=url, port=port, enabled=True)
@@ -38,7 +34,7 @@ class Test_Radarr:
         # Arrange
         os.environ["RADARR_API_KEY"] = "some-api-key"
 
-        requests_mock.get(f'http://{url}:{port}/api/v3/movie/lookup?apikey=some-api-key&term=Harry%20Potter',
+        requests_mock.get(f'http://{url}:{port}/api/v3/movie/lookup?term=Harry%20Potter',
                           text="{}",
                           status_code=500)
 
@@ -50,4 +46,4 @@ class Test_Radarr:
         result = sut.search(title)
 
         # Assess
-        assert result == []
+        assert result == {}

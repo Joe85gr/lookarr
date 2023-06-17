@@ -1,5 +1,8 @@
 from telegram import InlineKeyboardButton
 
+from src.infrastructure.folder import Folder
+from src.infrastructure.quality_profiles import QualityProfile
+
 
 class Buttons:
     @staticmethod
@@ -41,30 +44,28 @@ class Buttons:
     def next_button():
         return InlineKeyboardButton(
             "Next result" + ' \U000023ED',
-            callback_data="Next result"
+            callback_data="Next"
         )
 
     @staticmethod
-    def previous_button(
-
-    ):
+    def previous_button():
         return InlineKeyboardButton(
             '\U000023EE ' + "Previous result",
-            callback_data="Previous result"
+            callback_data="Previous"
         )
 
     @staticmethod
-    def path_button(path, free):
+    def path_button(folder: Folder):
         return InlineKeyboardButton(
-            f"Path: {path['path']}, Free: {free}",
-            callback_data=f"Path: {path['path']}"
+            f"Path: {folder.path}, Free: {folder.availableSpace}",
+            callback_data=f"Path: {folder.path}"
         )
 
     @staticmethod
-    def quality_profile_button(quality_profile):
+    def quality_profile_button(quality_profile: QualityProfile):
         return InlineKeyboardButton(
-            f"Quality: {quality_profile['name']}",
-            callback_data=f"Quality profile: {quality_profile['id']}"
+            f"Quality: {quality_profile.name}",
+            callback_data=f"Quality: {quality_profile.id}"
         )
 
     @staticmethod
@@ -77,6 +78,6 @@ class Buttons:
     @staticmethod
     def delete_button():
         return InlineKeyboardButton(
-            '\U00002795 ' + "Delete",
+            '\U0000274C ' + "Delete",
             callback_data="Delete"
         )
