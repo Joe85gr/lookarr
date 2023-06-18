@@ -12,6 +12,6 @@ Rename config-sample.yml to config.yml before running
 
 /auth <LOOKARR_AUTH_PASSWORD> is required when calling the bot the first time.
 
-Adding chat ids on the "strict_mode_allowed_ids" section within the config file enables "strict mode". This means the bot will stay silent if it's contacted by users which are not in the strict_mode_allowed_ids list.
+Adding chat ids on the "strict_mode_allowed_ids" section within the config file enables "strict mode". This means the bot will stay silent if it's contacted by users which are not in the strict_mode_allowed_ids list and they won't be able to authenticate.
 
-Entrypoint: src/app/main.py
+Entrypoint: src/main.py
