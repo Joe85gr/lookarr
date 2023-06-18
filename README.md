@@ -5,6 +5,8 @@ Telegram bot for managing Sonarr and Radarr.
 
 ## Overview
 ![Lookarr_Add](./imgs/banner_add.png)
+--
+![Lookarr_Add](./imgs/banner_in_library.png)
 
 ## How to run
 Requires env variables:
