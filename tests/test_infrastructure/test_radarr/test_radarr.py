@@ -2,7 +2,7 @@ import json
 import os
 
 from src.infrastructure.radarr.radarr import Radarr
-from src.app.config.radarr_config import RadarrConfig
+from src.domain.config.radarr_config import RadarrConfig
 
 url = "1.1.1.1"
 port = "7878"

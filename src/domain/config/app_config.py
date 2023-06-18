@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 
 from pydantic.main import BaseModel
 from yaml import safe_load
-from src.app.config.lookarr_config import LookarrConfig
-from src.app.config.radarr_config import RadarrConfig
+from src.domain.config.lookarr_config import LookarrConfig
+from src.domain.config.radarr_config import RadarrConfig
 from src.constants import CONFIG_FULL_PATH
 
 

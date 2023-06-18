@@ -1,16 +1,16 @@
 from dacite import from_dict
 from telegram.error import BadRequest
 
-from src.app.handlers.authentication import AuthHandler
-from src.app.handlers.stop import StopHandler
+from src.domain.handlers.authentication import AuthHandler
+from src.domain.handlers.stop import StopHandler
 from src.infrastructure.folder import Folder
 from src.infrastructure.media_server_factory import IMediaServerFactory
 from src.infrastructure.quality_profiles import QualityProfile
 from src.logger import Log
 from telegram import Update, InlineKeyboardMarkup, constants
 from telegram.ext import CallbackContext, ConversationHandler
-from src.app.interface.buttons import Buttons
-from src.app.config.app_config import Config
+from src.interface.buttons import Buttons
+from src.domain.config.app_config import Config
 from src.domain.user import UserReply
 
 

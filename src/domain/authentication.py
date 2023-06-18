@@ -1,6 +1,6 @@
 import os
 
-from src.app.config.lookarr_config import LookarrConfig
+from src.domain.config.lookarr_config import LookarrConfig
 from src.infrastructure.db.sqlite import IDatabase
 
 

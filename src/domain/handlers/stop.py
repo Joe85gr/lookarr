@@ -1,4 +1,4 @@
-from src.app.handlers.authentication import AuthHandler
+from src.domain.handlers.authentication import AuthHandler
 from src.logger import Log
 from telegram import Update
 from telegram.ext import CallbackContext, ConversationHandler

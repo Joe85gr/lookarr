@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import CallbackContext, ConversationHandler
 
-from src.app.config.lookarr_config import LookarrConfig
+from src.domain.config.lookarr_config import LookarrConfig
 from src.domain.authentication import Auth
 from src.domain.user import UserReply
 from src.logger import Log

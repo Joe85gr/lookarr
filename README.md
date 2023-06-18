@@ -5,8 +5,8 @@ Telegram bot for managing Sonarr and Radarr.
 
 ## How to run
 Requires env variables:
-- TELEGRAM_BOT_KEY
-- LOOKARR_AUTH_PASSWORD
+- TELEGRAM_BOT_KEY: Your telegram bot key. See [here](https://core.telegram.org/bots/tutorial) how to get yours.
+- LOOKARR_AUTH_PASSWORD: Your lookarr authentication password. Set it to something strong so others can't access your app 😄
 
 Rename config-sample.yml to config.yml before running
 

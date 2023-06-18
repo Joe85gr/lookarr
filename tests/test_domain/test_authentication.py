@@ -1,7 +1,7 @@
 import os
 
 from src.domain.authentication import Auth
-from src.app.config.app_config import LookarrConfig
+from src.domain.config.app_config import LookarrConfig
 from src.infrastructure.db.IDatabase import IDatabase
 
 
@@ -29,8 +29,6 @@ class Test_Auth:
             strict_mode=False,
             strict_mode_allowed_ids=[],
             search_all_command="Search",
-            search_series_command="Series",
-            search_movie_command="Movie"
         )
 
         # Act
@@ -48,8 +46,6 @@ class Test_Auth:
             strict_mode=True,
             strict_mode_allowed_ids=[userId],
             search_all_command="Search",
-            search_series_command="Series",
-            search_movie_command="Movie"
         )
 
         # Act
@@ -67,8 +63,6 @@ class Test_Auth:
             strict_mode=True,
             strict_mode_allowed_ids=[999],
             search_all_command="Search",
-            search_series_command="Series",
-            search_movie_command="Movie"
         )
         # Act
         result = sut.user_is_authenticated_strict(userId, config)

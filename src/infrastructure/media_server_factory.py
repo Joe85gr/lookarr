@@ -1,6 +1,6 @@
 from abc import abstractmethod, ABC
 
-from src.app.config.app_config import Config
+from src.domain.config.app_config import Config
 from src.infrastructure.media_server import MediaServer
 from src.infrastructure.radarr.movie import Movie
 from src.infrastructure.radarr.radarr import Radarr

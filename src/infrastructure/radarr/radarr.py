@@ -5,7 +5,7 @@ import json
 
 import requests
 
-from src.app.config.radarr_config import RadarrConfig
+from src.domain.config.radarr_config import RadarrConfig
 from src.infrastructure.media_server import IMediaServerRepository
 from src.infrastructure.radarr.movie import Movie
 from urllib.parse import quote
