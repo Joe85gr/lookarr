@@ -31,3 +31,8 @@ class StopHandler:
 
         items = [item for item in context.user_data]
         [context.user_data.pop(item) for item in items]
+
+    @staticmethod
+    def sendLostTrackMessage(update: Update, context: CallbackContext):
+        message = "Sorry, kinda lost track of the conversation.. 😅 try again!"
+        context.bot.send_message(chat_id=update.effective_message.chat_id, text=message)
