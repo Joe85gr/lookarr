@@ -1,6 +1,6 @@
 import sqlite3
 
-from src.infrastructure.IDatabase import IDatabase
+from src.infrastructure.db.IDatabase import IDatabase
 
 
 class Database(IDatabase):

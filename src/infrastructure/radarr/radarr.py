@@ -6,13 +6,13 @@ import json
 import requests
 
 from src.app.config.radarr_config import RadarrConfig
-from src.infrastructure.mediaServer import IMediaServer
-from src.infrastructure.movie import Movie
+from src.infrastructure.media_server import IMediaServerRepository
+from src.infrastructure.radarr.movie import Movie
 from urllib.parse import quote
 from src.logger import Log
 
 
-class Radarr(IMediaServer):
+class Radarr(IMediaServerRepository):
     def __init__(self, config: RadarrConfig):
         self.logger = Log.get_logger("src.infrastructure.radarr.Radarr")
         self.config = config
@@ -53,7 +53,7 @@ class Radarr(IMediaServer):
                 url += "&" + key + "=" + value
         return url.replace(" ", "%20").replace("?&", "?")
 
-    def addToLibrary(self, id: int, path: str, qualityProfileId):
+    def addToLibrary(self, id: int, path: str, qualityProfileId) -> bool:
         parameters = {"tmdbId": str(id)}
         req = requests.get(
             self.__generateApiQuery("movie/lookup/tmdb", parameters),

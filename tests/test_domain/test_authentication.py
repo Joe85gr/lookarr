@@ -1,9 +1,8 @@
 import os
 
 from src.domain.authentication import Auth
-from src.app.config.all_config import Config, LookarrConfig
-from src.app.config.radarr_config import RadarrConfig
-from src.infrastructure.IDatabase import IDatabase
+from src.app.config.app_config import LookarrConfig
+from src.infrastructure.db.IDatabase import IDatabase
 
 
 class MockDatabase(IDatabase):
@@ -25,7 +24,7 @@ class Test_Auth:
         # Arrange
         sut = Auth(MockDatabase())
 
-        lookarrConfig = LookarrConfig(
+        config = LookarrConfig(
             language="en-us",
             strict_mode=False,
             strict_mode_allowed_ids=[],
@@ -33,10 +32,6 @@ class Test_Auth:
             search_series_command="Series",
             search_movie_command="Movie"
         )
-
-        radarrConfig = RadarrConfig(url=None, port=None, enabled=False)
-
-        config = Config(lookarr=lookarrConfig, radarr=radarrConfig)
 
         # Act
         result = sut.user_is_authenticated_strict(1, config)
@@ -48,7 +43,7 @@ class Test_Auth:
         # Arrange
         sut = Auth(MockDatabase())
         userId = 123
-        lookarrConfig = LookarrConfig(
+        config = LookarrConfig(
             language="en-us",
             strict_mode=True,
             strict_mode_allowed_ids=[userId],
@@ -56,10 +51,6 @@ class Test_Auth:
             search_series_command="Series",
             search_movie_command="Movie"
         )
-
-        radarrConfig = RadarrConfig(url=None, port=None, enabled=False)
-
-        config = Config(lookarr=lookarrConfig, radarr=radarrConfig)
 
         # Act
         result = sut.user_is_authenticated_strict(userId, config)
@@ -71,7 +62,7 @@ class Test_Auth:
         # Arrange
         sut = Auth(MockDatabase())
         userId = 123
-        lookarrConfig = LookarrConfig(
+        config = LookarrConfig(
             language="en-us",
             strict_mode=True,
             strict_mode_allowed_ids=[999],
@@ -79,11 +70,6 @@ class Test_Auth:
             search_series_command="Series",
             search_movie_command="Movie"
         )
-
-        radarrConfig = RadarrConfig(url=None, port=None, enabled=False)
-
-        config = Config(lookarr=lookarrConfig, radarr=radarrConfig)
-
         # Act
         result = sut.user_is_authenticated_strict(userId, config)
 

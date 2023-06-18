@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
+
+from src.constants import YOUTUBE_BASE_URL, DEFAULT_IMAGE
 from src.infrastructure.ratings import Ratings
 
 
@@ -23,16 +25,24 @@ class Movie:
     genres: Optional[list[str]]
     overview: Optional[str]
     ratings: Optional[Ratings]
-    id: Optional[int] = None
-    youtubeTrailerUrl: str = None
-    date_added: datetime = None
     hasFile: bool = False
     youTubeTrailerId: Optional[str] = None
-    remotePoster: Optional[str] = "https://artworks.thetvdb.com/banners/images/missing/movie.jpg"
-    defaultPoster: str = "https://artworks.thetvdb.com/banners/images/missing/movie.jpg"
+    remotePoster: Optional[str] = DEFAULT_IMAGE
+    defaultPoster: str = DEFAULT_IMAGE
 
-    def __post_init__(self):
-        self.date_added = datetime.strptime(self.added, '%Y-%m-%dT%H:%M:%SZ')
-        self.id = self.tmdbId
+    @property
+    def is_in_library(self):
+        return datetime.strptime(self.added, '%Y-%m-%dT%H:%M:%SZ').year != 1
+
+    @property
+    def id(self) -> int:
+        return self.tmdbId
+
+    @property
+    def youtubeTrailerUrl(self):
         if self.youTubeTrailerId:
-            self.youtubeTrailerUrl = f"https://www.youtube.com/watch?v={self.youTubeTrailerId}"
+            return f"{YOUTUBE_BASE_URL}{self.youTubeTrailerId}"
+        else:
+            return None
+
+

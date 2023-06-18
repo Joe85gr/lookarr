@@ -1,4 +1,4 @@
-from src.infrastructure.movie import Movie
+from src.infrastructure.radarr.movie import Movie
 from src.infrastructure.ratings import Ratings, Rating
 
 
