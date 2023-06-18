@@ -13,8 +13,6 @@ class LookarrConfig:
     language: str
     strict_mode_allowed_ids: list[int]
     search_all_command: str
-    search_series_command: str
-    search_movie_command: str
     strict_mode: bool = False
 
     def __post_init__(self) -> None:

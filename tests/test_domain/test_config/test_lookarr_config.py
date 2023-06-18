@@ -1,6 +1,6 @@
 import pytest
 
-from src.app.config.lookarr_config import LookarrConfig
+from src.domain.config.lookarr_config import LookarrConfig
 from src.constants import SUPPORTED_LANGUAGES
 
 
@@ -11,8 +11,6 @@ class Test_LookarrConfig:
             language="en-us",
             strict_mode_allowed_ids=[],
             search_all_command="Search",
-            search_series_command="Series",
-            search_movie_command="Movie"
         )
 
         # Assert
@@ -25,8 +23,6 @@ class Test_LookarrConfig:
             language="en-us",
             strict_mode_allowed_ids=[123],
             search_all_command="Search",
-            search_series_command="Series",
-            search_movie_command="Movie"
         )
 
         # Assert
@@ -42,8 +38,6 @@ class Test_LookarrConfig:
                 language="gibberish",
                 strict_mode_allowed_ids=[123],
                 search_all_command="Search",
-                search_series_command="Series",
-                search_movie_command="Movie"
             )
 
         errorMessage = result.value.args[0][0].exc.args[0]

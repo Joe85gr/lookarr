@@ -2,5 +2,8 @@ lookarr:
   language: en-us
   strict_mode_allowed_ids: [ ]
   search_all_command: search
-  search_series_command: series
-  search_movie_command: movie
+
+radarr:
+  enabled: True
+  url: 0.0.0.0
+  port: 7878
