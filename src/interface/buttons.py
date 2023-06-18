@@ -76,9 +76,9 @@ class Buttons:
         )
 
     @staticmethod
-    def delete_button():
+    def delete_button(delete_text: str = "Delete"):
         return InlineKeyboardButton(
-            '\U0000274C ' + "Delete",
+            '\U0000274C ' + delete_text,
             callback_data="ConfirmDelete"
         )
 

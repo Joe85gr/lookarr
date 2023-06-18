@@ -32,13 +32,15 @@ class AuthHandler:
         else:
             update.message.reply_text(text=f"Nice one! You're in buddy 😌")
 
-    def check_if_auth(self, update: Update) -> None | int:
+    def user_is_authenticated(self, update: Update) -> bool:
         user = update.effective_user
 
         if not self.auth.user_is_authenticated_strict(user.id, self.config):
             self.logger.info(f"unauthorised user {user.id}")
-            return ConversationHandler.END
+            return False
         elif not self.auth.user_is_authenticated(user.id):
             update.message.reply_text(
                 "Well, shit! 😄 seems you're not authenticated! Write /auth <password> to authenticate!")
-            return ConversationHandler.END
+            return False
+
+        return True
