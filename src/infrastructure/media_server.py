@@ -19,6 +19,10 @@ class IMediaServerRepository(ABC):
         """Adds Entry to Library"""
 
     @abstractmethod
+    def removeFromLibrary(self, id: int) -> bool:
+        """Removes Entry from Library"""
+
+    @abstractmethod
     def getRootFolders(self):
         """Returns List Folders where Media can  be stored"""
 

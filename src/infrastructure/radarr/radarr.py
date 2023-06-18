@@ -70,6 +70,17 @@ class Radarr(IMediaServerRepository):
             self.logger.error(f"Radarr error while adding {id} status code: {add.status_code}, error: {add.text}")
             return False
 
+    def removeFromLibrary(self, id: int) -> bool:
+        query = f'{self.__generateApiQuery(f"movie")}/{id}'
+        req = requests.delete(
+            query,
+            headers={'X-Api-Key': str(os.environ.get("RADARR_API_KEY"))})
+        if req.status_code == 200:
+            return True
+        else:
+            self.logger.error(f"Radarr error while removing {id} status code: {req.status_code}, error: {req.text}")
+            return False
+
     def getRootFolders(self):
         req = requests.get(self.__generateApiQuery("Rootfolder"),
                            headers={'X-Api-Key': str(os.environ.get("RADARR_API_KEY"))})

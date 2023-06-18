@@ -79,5 +79,19 @@ class Buttons:
     def delete_button():
         return InlineKeyboardButton(
             '\U0000274C ' + "Delete",
+            callback_data="ConfirmDelete"
+        )
+
+    @staticmethod
+    def yes_button():
+        return InlineKeyboardButton(
+            'Yes',
             callback_data="Delete"
+        )
+
+    @staticmethod
+    def no_button():
+        return InlineKeyboardButton(
+            'No',
+            callback_data="Stop"
         )

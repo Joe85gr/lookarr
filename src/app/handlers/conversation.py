@@ -29,7 +29,7 @@ class SearchHandler:
         self.config = config
         self.media_server_factory = media_server_factory
 
-    def searchType(self, update: Update, context: CallbackContext) -> None | int:
+    def __validateSearch(self, update: Update, context: CallbackContext) -> None | int:
         self.auth_handler.check_if_auth(update)
 
         user_reply = UserReply(update.message.text)
@@ -39,9 +39,14 @@ class SearchHandler:
                 "Well, I'm unsure what you want me to search..🧐\nwrite /search <search criteria> "
                 "to get some results.")
             self.stop_handler.clearUserData(update, context)
-            return ConversationHandler.END
+            return False
 
         context.user_data["reply"] = user_reply.value
+        return True
+
+    def search(self, update: Update, context: CallbackContext) -> None | int:
+        if not self.__validateSearch(update, context):
+            return ConversationHandler.END
 
         keyboard = [
             [self.buttons.series_button(), self.buttons.movie_button()],
@@ -173,6 +178,70 @@ class SearchHandler:
                                    message_id=context.user_data["update_msg"])
 
         context.bot.send_message(chat_id=update.effective_message.chat_id, text=message)
+
+        self.stop_handler.clearUserData(update, context)
+        return ConversationHandler.END
+
+    def confirmDelete(self, update: Update, context: CallbackContext):
+        query = update.callback_query
+        query.answer()
+
+        if not context.user_data.get("update_msg") or not context.user_data["type"]:
+            self.stop_handler.clearUserData(update, context)
+            return ConversationHandler.END
+
+        position = context.user_data["position"]
+        title_to_remove = context.user_data['results'][position]['title']
+        message = f"You sure you want to remove {title_to_remove} from your Library? 😱"
+
+        keyboard = [
+            [self.buttons.yes_button()],
+            [self.buttons.no_button()]
+        ]
+
+        reply_markup = InlineKeyboardMarkup(keyboard)
+
+        context.bot.delete_message(chat_id=update.effective_message.chat_id,
+                                   message_id=context.user_data["update_msg"])
+
+        msg = context.bot.sendMessage(
+            chat_id=update.effective_message.chat_id,
+            text=message,
+            reply_markup=reply_markup,
+        )
+
+        context.user_data["update_msg"] = msg.message_id
+
+    def delete(self, update: Update, context: CallbackContext):
+        query = update.callback_query
+        query.answer()
+
+        self.auth_handler.check_if_auth(update)
+
+        if not context.user_data.get("update_msg") or not context.user_data["type"]:
+            self.stop_handler.clearUserData(update, context)
+            return ConversationHandler.END
+
+        system = self.media_server_factory.getMediaServer(context.user_data["type"])
+
+        position = context.user_data["position"]
+        id_to_remove = context.user_data['results'][position]['id']
+        title_to_remove = context.user_data['results'][position]['title']
+
+        contentRemoved = system.media_server.removeFromLibrary(id_to_remove)
+
+        if contentRemoved:
+            message = f"{title_to_remove} has been removed from your Library! 😤"
+        else:
+            message = f"Unfortunately I was unable to remove '{title_to_remove}' to your library 😔 try again.."
+
+        context.bot.delete_message(chat_id=update.effective_message.chat_id,
+                                   message_id=context.user_data["update_msg"])
+
+        context.bot.send_message(chat_id=update.effective_message.chat_id, text=message)
+
+        self.stop_handler.clearUserData(update, context)
+        return ConversationHandler.END
 
     def searchMedia(self, update: Update, context: CallbackContext) -> None:
         query = update.callback_query
