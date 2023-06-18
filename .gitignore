@@ -5,6 +5,7 @@ user_config/config.yml
 .coverage
 *.log
 user_config/lookar.db
+user_config/lookar.db.bak
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -236,3 +237,4 @@ fabric.properties
 
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
+

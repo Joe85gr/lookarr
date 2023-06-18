@@ -23,28 +23,29 @@ class SearchHandler:
             media_server_factory: IMediaServerFactory
     ):
         self.logger = Log.get_logger(__name__)
-        self.auth_handler = auth_handler
-        self.stop_handler = stop_handler
+        self.auth = auth_handler
+        self.stop = stop_handler
         self.buttons = Buttons()
         self.config = config
         self.media_server_factory = media_server_factory
 
     def __validateSearch(self, update: Update, context: CallbackContext) -> None | int:
-        self.auth_handler.check_if_auth(update)
-
         user_reply = UserReply(update.message.text)
 
         if not user_reply.is_valid:
             update.message.reply_text(
                 "Well, I'm unsure what you want me to search..🧐\nwrite /search <search criteria> "
                 "to get some results.")
-            self.stop_handler.clearUserData(update, context)
+            self.stop.clearUserData(update, context)
             return False
 
         context.user_data["reply"] = user_reply.value
         return True
 
     def search(self, update: Update, context: CallbackContext) -> None | int:
+        if not self.auth.user_is_authenticated(update):
+            return ConversationHandler.END
+
         if not self.__validateSearch(update, context):
             return ConversationHandler.END
 
@@ -62,7 +63,7 @@ class SearchHandler:
         query.answer()
 
         if not context.user_data.get("update_msg"):
-            self.stop_handler.clearUserData(update, context)
+            self.stop.clearUserData(update, context)
             return ConversationHandler.END
 
         if query.data == "Next":
@@ -77,7 +78,7 @@ class SearchHandler:
         query.answer()
 
         if not context.user_data.get("update_msg") or not context.user_data["type"]:
-            self.stop_handler.clearUserData(update, context)
+            self.stop.clearUserData(update, context)
             return ConversationHandler.END
 
         system = self.media_server_factory.getMediaServer(context.user_data["type"])
@@ -89,7 +90,7 @@ class SearchHandler:
             context.bot.send_message(chat_id=update.effective_message.chat_id,
                                      text=f"I couldn't retrieve the available '{context.user_data['type']}' "
                                           f"folders 😔 not much I can do really..")
-            self.stop_handler.clearUserData(update, context)
+            self.stop.clearUserData(update, context)
             return ConversationHandler.END
 
         results = [from_dict(data_class=Folder, data=folder) for folder in folders]
@@ -118,7 +119,7 @@ class SearchHandler:
         query.answer()
 
         if not context.user_data.get("update_msg") or not context.user_data["type"]:
-            self.stop_handler.clearUserData(update, context)
+            self.stop.clearUserData(update, context)
             return ConversationHandler.END
 
         system = self.media_server_factory.getMediaServer(context.user_data["type"])
@@ -155,7 +156,7 @@ class SearchHandler:
         query.answer()
 
         if not context.user_data.get("update_msg") or not context.user_data["type"]:
-            self.stop_handler.clearUserData(update, context)
+            self.stop.clearUserData(update, context)
             return ConversationHandler.END
 
         system = self.media_server_factory.getMediaServer(context.user_data["type"])
@@ -179,7 +180,7 @@ class SearchHandler:
 
         context.bot.send_message(chat_id=update.effective_message.chat_id, text=message)
 
-        self.stop_handler.clearUserData(update, context)
+        self.stop.clearUserData(update, context)
         return ConversationHandler.END
 
     def confirmDelete(self, update: Update, context: CallbackContext):
@@ -187,7 +188,7 @@ class SearchHandler:
         query.answer()
 
         if not context.user_data.get("update_msg") or not context.user_data["type"]:
-            self.stop_handler.clearUserData(update, context)
+            self.stop.clearUserData(update, context)
             return ConversationHandler.END
 
         position = context.user_data["position"]
@@ -216,10 +217,10 @@ class SearchHandler:
         query = update.callback_query
         query.answer()
 
-        self.auth_handler.check_if_auth(update)
+        self.auth.user_is_authenticated(update)
 
         if not context.user_data.get("update_msg") or not context.user_data["type"]:
-            self.stop_handler.clearUserData(update, context)
+            self.stop.clearUserData(update, context)
             return ConversationHandler.END
 
         system = self.media_server_factory.getMediaServer(context.user_data["type"])
@@ -240,7 +241,7 @@ class SearchHandler:
 
         context.bot.send_message(chat_id=update.effective_message.chat_id, text=message)
 
-        self.stop_handler.clearUserData(update, context, False)
+        self.stop.clearUserData(update, context, False)
         return ConversationHandler.END
 
     def searchMedia(self, update: Update, context: CallbackContext) -> None | int:
@@ -257,7 +258,7 @@ class SearchHandler:
 
         if not results:
             query.edit_message_text(text=f"Sorry, I couldn't fine any result for '{context.user_data['reply']}' 😔")
-            self.stop_handler.clearUserData(update, context, False)
+            self.stop.clearUserData(update, context, False)
             return ConversationHandler.END
 
         context.user_data["position"] = 0
@@ -278,8 +279,10 @@ class SearchHandler:
 
         if not current.is_in_library:
             keyboard = [[self.buttons.add_button()]]
-        else:
+        elif current.hasFile:
             keyboard = [[self.buttons.delete_button()]]
+        else:
+            keyboard = [[self.buttons.delete_button("Cancel Download")]]
 
         if len(results) > 1 and len(results) > position == 0:  # show next
             keyboard.append([self.buttons.next_button()])

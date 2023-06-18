@@ -13,8 +13,6 @@ class StopHandler:
         self.logger = Log.get_logger(__name__)
 
     def stop(self, update, context):
-        self.auth_handler.check_if_auth(update)
-
         self.clearUserData(update, context)
 
         context.bot.send_message(chat_id=update.effective_message.chat_id, text="Ok, nothing to do for me then 🌝")
