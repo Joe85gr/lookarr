@@ -21,14 +21,15 @@ class StopHandler:
 
         return ConversationHandler.END
 
-    def clearUserData(self, update: Update, context: CallbackContext):
+    def clearUserData(self, update: Update, context: CallbackContext, delete_last_message=True):
         msg = update.effective_message
 
-        try:
-            context.bot.delete_message(chat_id=update.effective_message.chat_id, message_id=msg.message_id)
-        except Exception as e:
-            if not e.message.startswith("Message to delete not found"):
-                self.logger.error(f"could not delete message id {msg.message_id}", e)
+        if delete_last_message:
+            try:
+                context.bot.delete_message(chat_id=update.effective_message.chat_id, message_id=msg.message_id)
+            except Exception as e:
+                if not e.message.startswith("Message to delete not found"):
+                    self.logger.error(f"could not delete message id {msg.message_id}", e)
 
         items = [item for item in context.user_data]
         [context.user_data.pop(item) for item in items]

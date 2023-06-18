@@ -240,10 +240,10 @@ class SearchHandler:
 
         context.bot.send_message(chat_id=update.effective_message.chat_id, text=message)
 
-        self.stop_handler.clearUserData(update, context)
+        self.stop_handler.clearUserData(update, context, False)
         return ConversationHandler.END
 
-    def searchMedia(self, update: Update, context: CallbackContext) -> None:
+    def searchMedia(self, update: Update, context: CallbackContext) -> None | int:
         query = update.callback_query
         query.answer()
 
@@ -254,6 +254,11 @@ class SearchHandler:
         query.edit_message_text(text=f"Looking for '{context.user_data['reply']}'..👀")
 
         results = system.media_server.search(context.user_data["reply"])
+
+        if not results:
+            query.edit_message_text(text=f"Sorry, I couldn't fine any result for '{context.user_data['reply']}' 😔")
+            self.stop_handler.clearUserData(update, context, False)
+            return ConversationHandler.END
 
         context.user_data["position"] = 0
         context.user_data["results"] = results

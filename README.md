@@ -3,6 +3,9 @@ Telegram bot for managing Sonarr and Radarr.
 
 -- Still under development. --
 
+## Overview
+![Lookarr_Add](./imgs/banner_add.png)
+
 ## How to run
 Requires env variables:
 - TELEGRAM_BOT_KEY: Your telegram bot key. See [here](https://core.telegram.org/bots/tutorial) how to get yours.
