@@ -62,9 +62,7 @@ class SearchHandler:
         query = update.callback_query
         query.answer()
 
-        if not context.user_data.get("update_msg"):
-            self.stop.sendLostTrackMessage(update, context)
-            self.stop.clearUserData(update, context)
+        if self.stop.lostTrackOfConversation(update, context, ["update_msg"]):
             return ConversationHandler.END
 
         if query.data == "Next":
@@ -78,9 +76,7 @@ class SearchHandler:
         query = update.callback_query
         query.answer()
 
-        if not context.user_data.get("update_msg") or not context.user_data["type"]:
-            self.stop.sendLostTrackMessage(update, context)
-            self.stop.clearUserData(update, context)
+        if self.stop.lostTrackOfConversation(update, context, ["update_msg", "type"]):
             return ConversationHandler.END
 
         system = self.media_server_factory.getMediaServer(context.user_data["type"])
@@ -120,9 +116,7 @@ class SearchHandler:
         query = update.callback_query
         query.answer()
 
-        if not context.user_data.get("update_msg") or not context.user_data["type"]:
-            self.stop.sendLostTrackMessage(update, context)
-            self.stop.clearUserData(update, context)
+        if self.stop.lostTrackOfConversation(update, context, ["update_msg", "type"]):
             return ConversationHandler.END
 
         system = self.media_server_factory.getMediaServer(context.user_data["type"])
@@ -158,9 +152,7 @@ class SearchHandler:
         query = update.callback_query
         query.answer()
 
-        if not context.user_data.get("update_msg") or not context.user_data["type"]:
-            self.stop.sendLostTrackMessage(update, context)
-            self.stop.clearUserData(update, context)
+        if self.stop.lostTrackOfConversation(update, context, ["update_msg", "type"]):
             return ConversationHandler.END
 
         system = self.media_server_factory.getMediaServer(context.user_data["type"])
@@ -191,9 +183,7 @@ class SearchHandler:
         query = update.callback_query
         query.answer()
 
-        if not context.user_data.get("update_msg") or not context.user_data["type"]:
-            self.stop.clearUserData(update, context)
-            self.stop.sendLostTrackMessage(update, context)
+        if self.stop.lostTrackOfConversation(update, context, ["update_msg", "type"]):
             return ConversationHandler.END
 
         position = context.user_data["position"]
@@ -224,9 +214,7 @@ class SearchHandler:
 
         self.auth.user_is_authenticated(update)
 
-        if not context.user_data.get("update_msg") or not context.user_data["type"]:
-            self.stop.sendLostTrackMessage(update, context)
-            self.stop.clearUserData(update, context)
+        if self.stop.lostTrackOfConversation(update, context, ["update_msg", "type"]):
             return ConversationHandler.END
 
         system = self.media_server_factory.getMediaServer(context.user_data["type"])
@@ -255,6 +243,9 @@ class SearchHandler:
         query.answer()
 
         context.user_data["type"] = query.data
+
+        if self.stop.lostTrackOfConversation(update, context, ["type", "reply"]):
+            return ConversationHandler.END
 
         system = self.media_server_factory.getMediaServer(context.user_data["type"])
 
@@ -322,9 +313,9 @@ class SearchHandler:
         if len(message) >= 900:
             message = message[:900].rsplit(' ', 1)[0] + "[...]"
 
-        # if "update_msg" in context.user_data:
-        #     context.bot.delete_message(chat_id=update.effective_message.chat_id,
-        #                                message_id=context.user_data["update_msg"])
+        if "update_msg" in context.user_data:
+            context.bot.delete_message(chat_id=update.effective_message.chat_id,
+                                       message_id=context.user_data["update_msg"])
 
         try:
             msg = context.bot.sendPhoto(
