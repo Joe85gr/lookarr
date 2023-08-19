@@ -1,9 +1,24 @@
 import sqlite3
-
+from threading import Lock
 from src.infrastructure.db.IDatabase import IDatabase
 
 
 class Database(IDatabase):
+    _instance = None
+    _lock = Lock()
+
+    def __new__(cls, *args, **kwargs):
+        with cls._lock:
+            if not cls._instance:
+                cls._instance = super(Database, cls).__new__(cls)
+                cls._instance._initialized = False
+        return cls._instance
+
+    def __init__(self) -> None:
+        with self._lock:
+            if self._initialized:
+                return
+            self._initialized = True
 
     @staticmethod
     def initialise() -> None:
@@ -34,3 +49,5 @@ class Database(IDatabase):
                         """, data)
             return cur.fetchone()
 
+
+db = Database()

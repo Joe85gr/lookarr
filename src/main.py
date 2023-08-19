@@ -4,30 +4,27 @@ from os import environ, path, makedirs
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 
 from src.domain.handlers.conversation import SearchHandler
-from src.domain.config.app_config import ConfigLoader
+from src.domain.config.app_config import config
 from src.domain.handlers.authentication import AuthHandler
 from src.domain.handlers.help import HelpHandler
-from src.domain.handlers.stop import StopHandler
-from src.domain.authentication import Auth
+from src.domain.handlers.stop import stop_handler
 from src.domain.validators.env_validator import EnvValidator
-from src.infrastructure.db.sqlite import Database
+from src.infrastructure.db.sqlite import db
 from src.infrastructure.media_server_factory import MediaServerFactory
 
 
-config = ConfigLoader.set_config()
-auth = Auth(Database())
-mediaServerFactory = MediaServerFactory(config)
-authenticationHandler = AuthHandler(auth, config.lookarr)
+mediaServerFactory = MediaServerFactory()
+authenticationHandler = AuthHandler()
 helpHandler = HelpHandler()
-stopHandler = StopHandler(authenticationHandler)
-conversationHandler = SearchHandler(authenticationHandler, stopHandler, config, mediaServerFactory)
+
+conversationHandler = SearchHandler(mediaServerFactory)
 
 
 def initialise() -> None:
     if not path.exists("logs"):
         makedirs("logs")
 
-    Database.initialise()
+    db.initialise()
     env = EnvValidator()
     env.verify_required_env_variables_exist(config.radarr.enabled)
     if not env.is_valid:
@@ -48,7 +45,7 @@ def main() -> None:
     updater.dispatcher.add_handler(CallbackQueryHandler(conversationHandler.confirmDelete,
                                                         pattern="ConfirmDelete"))
     updater.dispatcher.add_handler(CallbackQueryHandler(conversationHandler.delete, pattern="Delete"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(stopHandler.stop, pattern="Stop"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(stop_handler.stop, pattern="Stop"))
     # updater.dispatcher.add_handler(CallbackQueryHandler(handlers.add, pattern="Add_This"))
     updater.dispatcher.add_handler(CommandHandler('help', helpHandler.help))
     updater.dispatcher.add_handler(CommandHandler('auth', authenticationHandler.authenticate))

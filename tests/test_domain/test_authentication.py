@@ -1,133 +1,103 @@
 import os
+from unittest.mock import patch
 
-from src.domain.authentication import Auth
-from src.domain.config.app_config import LookarrConfig
-from src.infrastructure.db.IDatabase import IDatabase
-
-
-class MockDatabase(IDatabase):
-    @staticmethod
-    def initialise() -> None:
-        pass
-
-    @staticmethod
-    def add_user(user: int) -> None:
-        pass
-
-    @staticmethod
-    def user_exists(user: int):
-        pass
+from src.domain.auth.authentication import Auth
+from src.domain.config.lookarr_config import LookarrConfig
 
 
 class Test_Auth:
-    def test_user_is_authenticated_strict_not_enabled(self):
+    @patch('src.domain.auth.authentication.db')
+    def test_user_is_authenticated(self, mocked_db):
         # Arrange
-        sut = Auth(MockDatabase())
+        mocked_db.user_exists.return_value = True
 
-        config = LookarrConfig(
-            language="en-us",
-            strict_mode=False,
-            strict_mode_allowed_ids=[],
-            search_all_command="Search",
-        )
+        sut = Auth()
 
         # Act
-        result = sut.user_is_authenticated_strict(1, config)
+        result = sut.user_is_authenticated(1)
 
-        # Assess
+        # Assert
         assert result is True
+        mocked_db.user_exists.assert_called_once_with(1)
 
-    def test_user_is_authenticated_strict_enabled_and_user_is_allowed(self):
+    @patch('src.domain.auth.authentication.db')
+    def test_user_is_not_authenticated(self, mocked_db):
         # Arrange
-        sut = Auth(MockDatabase())
-        userId = 123
-        config = LookarrConfig(
-            language="en-us",
-            strict_mode=True,
-            strict_mode_allowed_ids=[userId],
-            search_all_command="Search",
-        )
+        mocked_db.user_exists.return_value = False
+
+        sut = Auth()
 
         # Act
-        result = sut.user_is_authenticated_strict(userId, config)
+        result = sut.user_is_authenticated(1)
 
-        # Assess
-        assert result is True
+        # Assert
+        assert result is False
+        mocked_db.user_exists.assert_called_once_with(1)
 
-    def test_user_is_authenticated_strict_enabled_and_user_is_not_allowed(self):
+    def test_user_is_authenticated_strict(self):
         # Arrange
-        sut = Auth(MockDatabase())
-        userId = 123
         config = LookarrConfig(
             language="en-us",
             strict_mode=True,
-            strict_mode_allowed_ids=[999],
+            strict_mode_allowed_ids=[1, 2],
             search_all_command="Search",
         )
-        # Act
-        result = sut.user_is_authenticated_strict(userId, config)
 
-        # Assess
-        assert result is False
-
-    def test_user_is_authenticated_valid_user(self):
-        # Arrange
-        userId = 123
-
-        class MockDatabaseValidUser(MockDatabase):
-            @staticmethod
-            def user_exists(user: int):
-                return 1, userId
-
-        sut = Auth(MockDatabaseValidUser())
+        sut = Auth()
 
         # Act
-        result = sut.user_is_authenticated(userId)
+        result = Auth.user_is_authenticated_strict(1, config)
 
-        # Assess
+        # Assert
         assert result is True
 
-    def test_user_is_authenticated_invalid_user(self):
+    def test_user_is_not_authenticated_strict(self):
         # Arrange
-        userId = 123
+        config = LookarrConfig(
+            language="en-us",
+            strict_mode=True,
+            strict_mode_allowed_ids=[1, 2],
+            search_all_command="Search",
+        )
 
-        class MockDatabaseInvalidUser(MockDatabase):
-            @staticmethod
-            def user_exists(user: int):
-                return None
-
-        sut = Auth(MockDatabaseInvalidUser())
+        sut = Auth()
 
         # Act
-        result = sut.user_is_authenticated(userId)
+        result = Auth.user_is_authenticated_strict(3, config)
 
-        # Assess
+        # Assert
         assert result is False
 
-    def test_authenticate_user_valid_password(self):
+    @patch.dict(os.environ, {"LOOKARR_AUTH_PASSWORD": "valid_user"})
+    @patch('src.domain.auth.authentication.db')
+    def test_authenticate_valid_user(self, mocked_db):
         # Arrange
-        userId = 123
-        os.environ.clear()
-        os.environ["LOOKARR_AUTH_PASSWORD"] = "password"
-
-        sut = Auth(MockDatabase())
+        sut = Auth()
 
         # Act
-        result = sut.authenticate_user(userId, "password")
+        result = sut.authenticate_user(1, "valid_user")
 
-        # Assess
+        # Assert
         assert result is True
+        mocked_db.add_user.assert_called_once_with(1)
 
-    def test_authenticate_user_invalid_password(self):
+    @patch.dict(os.environ, {"LOOKARR_AUTH_PASSWORD": "valid_user"})
+    @patch('src.domain.auth.authentication.db')
+    def test_authenticate_invalid_user(self, mocked_db):
         # Arrange
-        userId = 123
-        os.environ.clear()
-        os.environ["LOOKARR_AUTH_PASSWORD"] = "password"
-
-        sut = Auth(MockDatabase())
+        sut = Auth()
 
         # Act
-        result = sut.authenticate_user(userId, "invalid password")
+        result = sut.authenticate_user(1, "invalid_user")
 
-        # Assess
+        # Assert
         assert result is False
+        assert mocked_db.add_user.call_count == 0
+
+    def test_auth_is_singleton(self):
+        # Act
+        auth1 = Auth()
+        auth2 = Auth()
+
+        # Assert
+        assert auth1 is auth2

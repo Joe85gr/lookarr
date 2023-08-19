@@ -1,8 +1,10 @@
 from dacite import from_dict
 from telegram.error import BadRequest
 
-from src.domain.handlers.authentication import AuthHandler
-from src.domain.handlers.stop import StopHandler
+from src.domain.auth.authentication import auth
+from src.domain.handlers.authentication_checker import check_authentication
+from src.domain.handlers.conversation_checker import check_conversation
+from src.domain.handlers.stop import stop_handler
 from src.infrastructure.folder import Folder
 from src.infrastructure.media_server_factory import IMediaServerFactory
 from src.infrastructure.quality_profiles import QualityProfile
@@ -10,43 +12,36 @@ from src.logger import Log
 from telegram import Update, InlineKeyboardMarkup, constants
 from telegram.ext import CallbackContext, ConversationHandler
 from src.interface.buttons import Buttons
-from src.domain.config.app_config import Config
+from src.domain.config.app_config import config
 from src.domain.user import UserReply
 
 
 class SearchHandler:
     def __init__(
             self,
-            auth_handler: AuthHandler,
-            stop_handler: StopHandler,
-            config: Config,
             media_server_factory: IMediaServerFactory
     ):
         self.logger = Log.get_logger(__name__)
-        self.auth = auth_handler
-        self.stop = stop_handler
         self.buttons = Buttons()
-        self.config = config
         self.media_server_factory = media_server_factory
 
-    def __validateSearch(self, update: Update, context: CallbackContext) -> None | int:
+    @staticmethod
+    def _search_is_valid(update: Update, context: CallbackContext) -> None | int:
         user_reply = UserReply(update.message.text)
 
         if not user_reply.is_valid:
             update.message.reply_text(
                 "Well, I'm unsure what you want me to search..🧐\nwrite /search <search criteria> "
                 "to get some results.")
-            self.stop.clearUserData(update, context)
+            stop_handler.clearUserData(update, context)
             return False
 
         context.user_data["reply"] = user_reply.value
         return True
 
+    @check_authentication(auth, config.lookarr)
     def search(self, update: Update, context: CallbackContext) -> None | int:
-        if not self.auth.user_is_authenticated(update):
-            return ConversationHandler.END
-
-        if not self.__validateSearch(update, context):
+        if not self._search_is_valid(update, context):
             return ConversationHandler.END
 
         keyboard = [
@@ -58,12 +53,10 @@ class SearchHandler:
 
         update.message.reply_text("What you're looking for? 🧐:", reply_markup=reply_markup)
 
-    def goToPreviousOrNextOption(self, update: Update, context: CallbackContext) -> None | int:
+    @check_conversation(["update_msg"])
+    @check_authentication(auth, config.lookarr)
+    def goToPreviousOrNextOption(self, update: Update, context: CallbackContext):
         query = update.callback_query
-        query.answer()
-
-        if self.stop.lostTrackOfConversation(update, context, ["update_msg"]):
-            return ConversationHandler.END
 
         if query.data == "Next":
             context.user_data["position"] += 1
@@ -72,12 +65,10 @@ class SearchHandler:
 
         self.showMedias(update, context)
 
+    @check_conversation(["update_msg", "type"])
+    @check_authentication(auth, config.lookarr)
     def getFolders(self, update: Update, context: CallbackContext):
         query = update.callback_query
-        query.answer()
-
-        if self.stop.lostTrackOfConversation(update, context, ["update_msg", "type"]):
-            return ConversationHandler.END
 
         system = self.media_server_factory.getMediaServer(context.user_data["type"])
         folders = system.media_server.getRootFolders()
@@ -88,7 +79,7 @@ class SearchHandler:
             context.bot.send_message(chat_id=update.effective_message.chat_id,
                                      text=f"I couldn't retrieve the available '{context.user_data['type']}' "
                                           f"folders 😔 not much I can do really..")
-            self.stop.clearUserData(update, context)
+            stop_handler.clearUserData(update, context)
             return ConversationHandler.END
 
         results = [from_dict(data_class=Folder, data=folder) for folder in folders]
@@ -112,12 +103,10 @@ class SearchHandler:
 
         context.user_data["update_msg"] = msg.message_id
 
+    @check_conversation(["update_msg", "type"])
+    @check_authentication(auth, config.lookarr)
     def getQualityProfiles(self, update: Update, context: CallbackContext):
         query = update.callback_query
-        query.answer()
-
-        if self.stop.lostTrackOfConversation(update, context, ["update_msg", "type"]):
-            return ConversationHandler.END
 
         system = self.media_server_factory.getMediaServer(context.user_data["type"])
 
@@ -148,12 +137,10 @@ class SearchHandler:
 
         context.user_data["update_msg"] = msg.message_id
 
+    @check_conversation(["update_msg", "type"])
+    @check_authentication(auth, config.lookarr)
     def addToLibrary(self, update: Update, context: CallbackContext):
         query = update.callback_query
-        query.answer()
-
-        if self.stop.lostTrackOfConversation(update, context, ["update_msg", "type"]):
-            return ConversationHandler.END
 
         system = self.media_server_factory.getMediaServer(context.user_data["type"])
 
@@ -176,16 +163,12 @@ class SearchHandler:
 
         context.bot.send_message(chat_id=update.effective_message.chat_id, text=message)
 
-        self.stop.clearUserData(update, context)
+        stop_handler.clearUserData(update, context)
         return ConversationHandler.END
 
+    @check_conversation(["update_msg", "type"])
+    @check_authentication(auth, config.lookarr)
     def confirmDelete(self, update: Update, context: CallbackContext):
-        query = update.callback_query
-        query.answer()
-
-        if self.stop.lostTrackOfConversation(update, context, ["update_msg", "type"]):
-            return ConversationHandler.END
-
         position = context.user_data["position"]
         title_to_remove = context.user_data['results'][position]['title']
         message = f"You sure you want to remove {title_to_remove} from your Library? 😱"
@@ -208,15 +191,9 @@ class SearchHandler:
 
         context.user_data["update_msg"] = msg.message_id
 
+    @check_conversation(["update_msg", "type"])
+    @check_authentication(auth, config.lookarr)
     def delete(self, update: Update, context: CallbackContext):
-        query = update.callback_query
-        query.answer()
-
-        self.auth.user_is_authenticated(update)
-
-        if self.stop.lostTrackOfConversation(update, context, ["update_msg", "type"]):
-            return ConversationHandler.END
-
         system = self.media_server_factory.getMediaServer(context.user_data["type"])
 
         position = context.user_data["position"]
@@ -235,16 +212,17 @@ class SearchHandler:
 
         context.bot.send_message(chat_id=update.effective_message.chat_id, text=message)
 
-        self.stop.clearUserData(update, context, False)
+        stop_handler.clearUserData(update, context, False)
         return ConversationHandler.END
 
+    @check_authentication(auth, config.lookarr)
     def searchMedia(self, update: Update, context: CallbackContext) -> None | int:
         query = update.callback_query
         query.answer()
 
         context.user_data["type"] = query.data
 
-        if self.stop.lostTrackOfConversation(update, context, ["type", "reply"]):
+        if stop_handler.lostTrackOfConversation(update, context, ["type", "reply"]):
             return ConversationHandler.END
 
         system = self.media_server_factory.getMediaServer(context.user_data["type"])
@@ -255,7 +233,7 @@ class SearchHandler:
 
         if not results:
             query.edit_message_text(text=f"Sorry, I couldn't fine any result for '{context.user_data['reply']}' 😔")
-            self.stop.clearUserData(update, context, False)
+            stop_handler.clearUserData(update, context, False)
             return ConversationHandler.END
 
         context.user_data["position"] = 0
@@ -265,6 +243,7 @@ class SearchHandler:
 
         self.showMedias(update, context)
 
+    @check_authentication(auth, config.lookarr)
     def showMedias(self, update: Update, context: CallbackContext):
         position = context.user_data["position"]
 

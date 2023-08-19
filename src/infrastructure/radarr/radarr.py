@@ -14,7 +14,7 @@ from src.logger import Log
 
 class Radarr(IMediaServerRepository):
     def __init__(self, config: RadarrConfig):
-        self.logger = Log.get_logger("src.infrastructure.radarr.Radarr")
+        self.logger = Log.get_logger(__name__)
         self.config = config
 
     def search(self, title: str = None, tmdbid: int = None) -> dict:

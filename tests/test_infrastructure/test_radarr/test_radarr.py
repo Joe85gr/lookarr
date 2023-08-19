@@ -1,24 +1,24 @@
-import json
 import os
+import json
+from unittest.mock import patch
 
 from src.infrastructure.radarr.radarr import Radarr
 from src.domain.config.radarr_config import RadarrConfig
+from tests.data.radarr import VALID_RESPONSE
 
 url = "1.1.1.1"
 port = "7878"
 
 
 class Test_Radarr:
-    def test_search_returns_valid_response(self, requests_mock):
+    @patch('src.infrastructure.radarr.radarr.Log')
+    def test_search_returns_valid_response(self, mock_log, requests_mock):
         # Arrange
         os.environ["RADARR_API_KEY"] = "some-api-key"
-
-        with open("tests/data/radarr_valid_response.json", "r") as file:
-            rawData = file.read()
-            expectedResult = json.loads(rawData)
+        expectedResult = VALID_RESPONSE
 
         requests_mock.get(f'http://{url}:{port}/api/v3/movie/lookup?term=Harry%20Potter',
-                          text=rawData, status_code=200)
+                          text=json.dumps(VALID_RESPONSE), status_code=200)
 
         config = RadarrConfig(url=url, port=port, enabled=True)
         sut = Radarr(config)
@@ -30,7 +30,8 @@ class Test_Radarr:
         # Assess
         assert result == expectedResult
 
-    def test_search_returns_500(self, requests_mock):
+    @patch('src.infrastructure.radarr.radarr.Log')
+    def test_search_returns_500(self, mock_log, requests_mock):
         # Arrange
         os.environ["RADARR_API_KEY"] = "some-api-key"
 
