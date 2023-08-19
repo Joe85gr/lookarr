@@ -1,8 +1,12 @@
 from os import environ
-from src.domain.validators.base_validator import BaseValidator
 
 
-class EnvValidator(BaseValidator):
+class EnvValidator:
+    def __init__(self, values: dict = None) -> None:
+        self.values = values
+        self.reasons = []
+        self.is_valid = False
+
     def verify_required_env_variables_exist(self, radarr_is_enabled: bool):
         self.is_valid = True
         self.reasons = []

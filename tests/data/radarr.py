@@ -1,4 +1,4 @@
-[
+VALID_RESPONSE = [
   {
     "title": "Boruto: Naruto the Movie",
     "originalTitle": "BORUTO -NARUTO THE MOVIE-",
@@ -163,13 +163,13 @@
     "website": "",
     "remotePoster": "https://image.tmdb.org/t/p/original/1k6iwC4KaPvTBt1JuaqXy3noZRY.jpg",
     "year": 2015,
-    "hasFile": false,
+    "hasFile": False,
     "youTubeTrailerId": "ld-oqpvOBAk",
     "studio": "Toho",
     "qualityProfileId": 0,
-    "monitored": false,
+    "monitored": False,
     "minimumAvailability": "tba",
-    "isAvailable": true,
+    "isAvailable": False,
     "folderName": "",
     "runtime": 95,
     "cleanTitle": "borutonarutomovie",
@@ -200,9 +200,9 @@
     "collection": {
       "title": "Naruto Collection",
       "tmdbId": 23616,
-      "monitored": false,
+      "monitored": False,
       "qualityProfileId": 0,
-      "searchOnAdd": false,
+      "searchOnAdd": False,
       "minimumAvailability": "tba",
       "images": [],
       "added": "0001-01-01T00:01:00Z",

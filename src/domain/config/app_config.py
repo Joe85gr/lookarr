@@ -26,3 +26,6 @@ class ConfigLoader(IConfigLoader):
             rawConfig = safe_load(file)
 
         return Config(**rawConfig)
+
+
+config = ConfigLoader.set_config()

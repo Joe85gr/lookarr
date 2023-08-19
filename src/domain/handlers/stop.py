@@ -1,4 +1,6 @@
-from src.domain.handlers.authentication import AuthHandler
+from src.domain.auth.authentication import auth
+from src.domain.config.app_config import config
+from src.domain.handlers.authentication_checker import check_authentication
 from src.logger import Log
 from telegram import Update
 from telegram.ext import CallbackContext, ConversationHandler
@@ -6,13 +8,10 @@ from telegram.error import BadRequest
 
 
 class StopHandler:
-    def __init__(
-            self,
-            auth_handler: AuthHandler
-    ):
-        self.auth_handler = auth_handler
+    def __init__(self):
         self.logger = Log.get_logger(__name__)
 
+    @check_authentication(auth, config.lookarr)
     def stop(self, update, context):
         self.clearUserData(update, context)
 
@@ -46,3 +45,6 @@ class StopHandler:
     def __sendLostTrackMessage(update: Update, context: CallbackContext):
         message = "Sorry, kinda lost track of the conversation.. 😅 try again!"
         context.bot.send_message(chat_id=update.effective_message.chat_id, text=message)
+
+
+stop_handler = StopHandler()

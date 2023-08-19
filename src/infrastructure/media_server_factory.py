@@ -1,6 +1,6 @@
 from abc import abstractmethod, ABC
 
-from src.domain.config.app_config import Config
+from src.domain.config.app_config import config
 from src.infrastructure.media_server import MediaServer
 from src.infrastructure.radarr.movie import Movie
 from src.infrastructure.radarr.radarr import Radarr
@@ -13,7 +13,7 @@ class IMediaServerFactory(ABC):
 
 
 class MediaServerFactory(IMediaServerFactory):
-    def __init__(self, config: Config):
+    def __init__(self):
         self.__systems = {
             "Movie": MediaServer(Radarr(config.radarr), Movie)
         }
