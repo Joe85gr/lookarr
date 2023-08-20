@@ -1,5 +1,5 @@
 from src.domain.checkers.authentication_checker import check_user_is_authenticated
-from src.logger import Log
+from src.logger import logger
 from telegram import Update
 from telegram.ext import CallbackContext, ConversationHandler
 from telegram.error import BadRequest
@@ -7,7 +7,7 @@ from telegram.error import BadRequest
 
 class StopHandler:
     def __init__(self):
-        self._logger = Log.get_logger(__name__)
+        self._logger = logger.name = __name__
 
     @check_user_is_authenticated()
     def stop(self, update, context):
