@@ -8,14 +8,14 @@ from src.logger import Log
 
 class AuthHandler:
     def __init__(self):
-        self.logger = Log.get_logger(__name__)
+        self._logger = Log.get_logger(__name__)
 
     def authenticate(self, update: Update, context: CallbackContext) -> None | int:
         user = update.effective_user
         user_reply = UserReply(update.message.text)
 
         if not auth.user_is_authenticated_strict(user.id, config.lookarr):
-            self.logger.info(f"unauthorised user {user.id}. Won't reply :D")
+            self._logger.info(f"unauthorised user {user.id}. Won't reply :D")
             return ConversationHandler.END
         elif auth.user_is_authenticated(user.id):
             update.message.reply_text(
