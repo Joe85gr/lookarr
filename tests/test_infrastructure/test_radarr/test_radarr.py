@@ -1,7 +1,5 @@
 import os
 import json
-from unittest.mock import patch
-
 from src.infrastructure.radarr.radarr import Radarr
 from src.domain.config.radarr_config import RadarrConfig
 from tests.data.radarr import VALID_RESPONSE
@@ -11,8 +9,7 @@ port = "7878"
 
 
 class Test_Radarr:
-    @patch('src.infrastructure.radarr.radarr.Log')
-    def test_search_returns_valid_response(self, mock_log, requests_mock):
+    def test_search_returns_valid_response(self, requests_mock):
         # Arrange
         os.environ["RADARR_API_KEY"] = "some-api-key"
         expectedResult = VALID_RESPONSE
@@ -30,8 +27,7 @@ class Test_Radarr:
         # Assess
         assert result == expectedResult
 
-    @patch('src.infrastructure.radarr.radarr.Log')
-    def test_search_returns_500(self, mock_log, requests_mock):
+    def test_search_returns_500(self, requests_mock):
         # Arrange
         os.environ["RADARR_API_KEY"] = "some-api-key"
 

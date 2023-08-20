@@ -1,5 +1,3 @@
-from functools import wraps
-
 from telegram import Update
 from telegram.ext import CallbackContext, ConversationHandler
 
@@ -7,14 +5,14 @@ from src.domain.config.app_config import config
 from src.domain.auth.authentication import auth
 from src.logger import logger
 
+logger.name = __name__
+
 
 class check_user_is_authenticated:
     def __init__(self):
         self._config = config.lookarr
-        logger.name = __name__
 
     def __call__(self, func):
-        @wraps(func)
         def wrapper(cls, update: Update, context: CallbackContext) -> object:
             user = update.effective_user
 

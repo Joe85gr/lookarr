@@ -11,10 +11,11 @@ from src.infrastructure.radarr.movie import Movie
 from urllib.parse import quote
 from src.logger import logger
 
+logger.name = __name__
+
 
 class Radarr(IMediaServerRepository):
     def __init__(self, config: RadarrConfig):
-        self.logger = logger.name = __name__
         self.config = config
 
     def search(self, title: str = None, tmdbid: int = None) -> dict:
@@ -27,7 +28,7 @@ class Radarr(IMediaServerRepository):
             parsed_json = json.loads(response.text)
             return parsed_json
         else:
-            self.logger.error(f"Radarr error while seaeching {title} status code: {response.status_code}")
+            logger.error(f"Radarr error while searching {title} status code: {response.status_code}")
             return {}
 
     def getMyLibrary(self) -> list[Movie]:
@@ -67,7 +68,7 @@ class Radarr(IMediaServerRepository):
         if add.status_code == 201:
             return True
         else:
-            self.logger.error(f"Radarr error while adding {id} status code: {add.status_code}, error: {add.text}")
+            logger.error(f"Radarr error while adding {id} status code: {add.status_code}, error: {add.text}")
             return False
 
     def removeFromLibrary(self, id: int) -> bool:
@@ -78,7 +79,7 @@ class Radarr(IMediaServerRepository):
         if req.status_code == 200:
             return True
         else:
-            self.logger.error(f"Radarr error while removing {id} status code: {req.status_code}, error: {req.text}")
+            logger.error(f"Radarr error while removing {id} status code: {req.status_code}, error: {req.text}")
             return False
 
     def getRootFolders(self):
