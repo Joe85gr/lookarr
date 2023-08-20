@@ -3,12 +3,13 @@ from telegram.ext import CallbackContext, ConversationHandler
 
 from src.domain.config.app_config import config
 from src.domain.auth.authentication import auth
-from src.logger import Log
+from src.logger import logger
+
+logger.name = __name__
 
 
 class check_user_is_authenticated:
     def __init__(self):
-        self._logger = Log.get_logger(__name__)
         self._config = config.lookarr
 
     def __call__(self, func):
@@ -16,7 +17,7 @@ class check_user_is_authenticated:
             user = update.effective_user
 
             if not auth.user_is_authenticated_strict(user.id, self._config):
-                self._logger.info(f"unauthorised user {user.id}")
+                logger.info(f"unauthorised user {user.id}")
                 return ConversationHandler.END
             elif not auth.user_is_authenticated(user.id):
                 update.message.reply_text(

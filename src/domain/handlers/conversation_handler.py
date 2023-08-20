@@ -8,7 +8,7 @@ from src.domain.handlers.stop_handler import stop_handler
 from src.infrastructure.folder import Folder
 from src.infrastructure.media_server_factory import IMediaServerFactory
 from src.infrastructure.quality_profiles import QualityProfile
-from src.logger import Log
+from src.logger import logger
 from telegram import Update, InlineKeyboardMarkup, constants
 from telegram.ext import CallbackContext, ConversationHandler
 from src.interface.buttons import Buttons
@@ -19,12 +19,12 @@ class SearchHandler:
             self,
             media_server_factory: IMediaServerFactory
     ):
-        self._logger = Log.get_logger(__name__)
+        self._logger = logger.name = __name__
         self._buttons = Buttons()
         self._media_server_factory = media_server_factory
 
-    @check_search_is_valid()
     @check_user_is_authenticated()
+    @check_search_is_valid()
     def search(self, update: Update, context: CallbackContext):
         keyboard = [
             [self._buttons.series_button(), self._buttons.movie_button()],
