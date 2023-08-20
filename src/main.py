@@ -3,11 +3,11 @@ from os import environ, path, makedirs
 
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 
-from src.domain.handlers.conversation import SearchHandler
+from src.domain.handlers.conversation_handler import SearchHandler
 from src.domain.config.app_config import config
-from src.domain.handlers.authentication import AuthHandler
-from src.domain.handlers.help import HelpHandler
-from src.domain.handlers.stop import stop_handler
+from src.domain.handlers.authentication_handler import AuthHandler
+from src.domain.handlers.help_handler import HelpHandler
+from src.domain.handlers.stop_handler import stop_handler
 from src.domain.validators.env_validator import EnvValidator
 from src.infrastructure.db.sqlite import db
 from src.infrastructure.media_server_factory import MediaServerFactory

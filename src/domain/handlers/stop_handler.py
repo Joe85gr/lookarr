@@ -1,6 +1,4 @@
-from src.domain.auth.authentication import auth
-from src.domain.config.app_config import config
-from src.domain.handlers.authentication_checker import check_authentication
+from src.domain.checkers.authentication_checker import check_user_is_authenticated
 from src.logger import Log
 from telegram import Update
 from telegram.ext import CallbackContext, ConversationHandler
@@ -9,9 +7,9 @@ from telegram.error import BadRequest
 
 class StopHandler:
     def __init__(self):
-        self.logger = Log.get_logger(__name__)
+        self._logger = Log.get_logger(__name__)
 
-    @check_authentication(auth, config.lookarr)
+    @check_user_is_authenticated()
     def stop(self, update, context):
         self.clearUserData(update, context)
 
@@ -27,7 +25,7 @@ class StopHandler:
                 context.bot.delete_message(chat_id=update.effective_message.chat_id, message_id=msg.message_id)
             except BadRequest as e:
                 if not e.message.startswith("Message to delete not found"):
-                    self.logger.error(f"could not delete message id {msg.message_id}", e)
+                    self._logger.error(f"could not delete message id {msg.message_id}", e)
 
         items = [item for item in context.user_data]
         [context.user_data.pop(item) for item in items]

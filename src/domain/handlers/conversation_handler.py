@@ -1,10 +1,10 @@
 from dacite import from_dict
 from telegram.error import BadRequest
 
-from src.domain.auth.authentication import auth
-from src.domain.handlers.authentication_checker import check_authentication
-from src.domain.handlers.conversation_checker import check_conversation
-from src.domain.handlers.stop import stop_handler
+from src.domain.checkers.authentication_checker import check_user_is_authenticated
+from src.domain.checkers.conversation_checker import check_conversation
+from src.domain.checkers.search_checker import check_search_is_valid
+from src.domain.handlers.stop_handler import stop_handler
 from src.infrastructure.folder import Folder
 from src.infrastructure.media_server_factory import IMediaServerFactory
 from src.infrastructure.quality_profiles import QualityProfile
@@ -12,8 +12,6 @@ from src.logger import Log
 from telegram import Update, InlineKeyboardMarkup, constants
 from telegram.ext import CallbackContext, ConversationHandler
 from src.interface.buttons import Buttons
-from src.domain.config.app_config import config
-from src.domain.user import UserReply
 
 
 class SearchHandler:
@@ -21,32 +19,16 @@ class SearchHandler:
             self,
             media_server_factory: IMediaServerFactory
     ):
-        self.logger = Log.get_logger(__name__)
-        self.buttons = Buttons()
-        self.media_server_factory = media_server_factory
+        self._logger = Log.get_logger(__name__)
+        self._buttons = Buttons()
+        self._media_server_factory = media_server_factory
 
-    @staticmethod
-    def _search_is_valid(update: Update, context: CallbackContext) -> None | int:
-        user_reply = UserReply(update.message.text)
-
-        if not user_reply.is_valid:
-            update.message.reply_text(
-                "Well, I'm unsure what you want me to search..🧐\nwrite /search <search criteria> "
-                "to get some results.")
-            stop_handler.clearUserData(update, context)
-            return False
-
-        context.user_data["reply"] = user_reply.value
-        return True
-
-    @check_authentication(auth, config.lookarr)
-    def search(self, update: Update, context: CallbackContext) -> None | int:
-        if not self._search_is_valid(update, context):
-            return ConversationHandler.END
-
+    @check_search_is_valid()
+    @check_user_is_authenticated()
+    def search(self, update: Update, context: CallbackContext):
         keyboard = [
-            [self.buttons.series_button(), self.buttons.movie_button()],
-            [self.buttons.stop_button()],
+            [self._buttons.series_button(), self._buttons.movie_button()],
+            [self._buttons.stop_button()],
         ]
 
         reply_markup = InlineKeyboardMarkup(keyboard)
@@ -54,24 +36,25 @@ class SearchHandler:
         update.message.reply_text("What you're looking for? 🧐:", reply_markup=reply_markup)
 
     @check_conversation(["update_msg"])
-    @check_authentication(auth, config.lookarr)
+    @check_user_is_authenticated()
     def goToPreviousOrNextOption(self, update: Update, context: CallbackContext):
         query = update.callback_query
 
-        if query.data == "Next":
-            context.user_data["position"] += 1
-        elif query.data == "Previous":
-            context.user_data["position"] -= 1
+        match query.data:
+            case "Next":
+                context.user_data["position"] += 1
+            case "Previous":
+                context.user_data["position"] -= 1
 
         self.showMedias(update, context)
 
     @check_conversation(["update_msg", "type"])
-    @check_authentication(auth, config.lookarr)
+    @check_user_is_authenticated()
     def getFolders(self, update: Update, context: CallbackContext):
         query = update.callback_query
 
-        system = self.media_server_factory.getMediaServer(context.user_data["type"])
-        folders = system.media_server.getRootFolders()
+        media_server = self._media_server_factory.getMediaServer(context.user_data["type"])
+        folders = media_server.media_server.getRootFolders()
 
         if not folders:
             context.bot.delete_message(chat_id=update.effective_message.chat_id,
@@ -87,9 +70,9 @@ class SearchHandler:
         keyboard = []
 
         for folder in results:
-            keyboard.append([self.buttons.path_button(folder)])
+            keyboard.append([self._buttons.path_button(folder)])
 
-        keyboard.append([self.buttons.stop_button()])
+        keyboard.append([self._buttons.stop_button()])
 
         reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -104,25 +87,25 @@ class SearchHandler:
         context.user_data["update_msg"] = msg.message_id
 
     @check_conversation(["update_msg", "type"])
-    @check_authentication(auth, config.lookarr)
+    @check_user_is_authenticated()
     def getQualityProfiles(self, update: Update, context: CallbackContext):
         query = update.callback_query
 
-        system = self.media_server_factory.getMediaServer(context.user_data["type"])
+        media_server = self._media_server_factory.getMediaServer(context.user_data["type"])
 
         if not context.user_data.get("path"):
             context.user_data["path"] = query.data.removeprefix("Path: ")
 
-        qualityProfiles = system.media_server.getQualityProfiles()
+        qualityProfiles = media_server.media_server.getQualityProfiles()
 
         results = [from_dict(data_class=QualityProfile, data=entry) for entry in qualityProfiles]
 
         keyboard = []
 
         for profile in results:
-            keyboard.append([self.buttons.quality_profile_button(profile)])
+            keyboard.append([self._buttons.quality_profile_button(profile)])
 
-        keyboard.append([self.buttons.stop_button()])
+        keyboard.append([self._buttons.stop_button()])
 
         reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -138,17 +121,17 @@ class SearchHandler:
         context.user_data["update_msg"] = msg.message_id
 
     @check_conversation(["update_msg", "type"])
-    @check_authentication(auth, config.lookarr)
+    @check_user_is_authenticated()
     def addToLibrary(self, update: Update, context: CallbackContext):
         query = update.callback_query
 
-        system = self.media_server_factory.getMediaServer(context.user_data["type"])
+        media_server = self._media_server_factory.getMediaServer(context.user_data["type"])
 
         if not context.user_data.get("quality_profile"):
             context.user_data["quality_profile"] = query.data.removeprefix("Quality: ")
 
-        contentAdded = system.media_server.addToLibrary(context.user_data['id'], context.user_data['path'],
-                                                        context.user_data['quality_profile'])
+        contentAdded = media_server.media_server.addToLibrary(context.user_data['id'], context.user_data['path'],
+                                                              context.user_data['quality_profile'])
 
         position = context.user_data["position"]
         title_added = context.user_data['results'][position]['title']
@@ -167,15 +150,15 @@ class SearchHandler:
         return ConversationHandler.END
 
     @check_conversation(["update_msg", "type"])
-    @check_authentication(auth, config.lookarr)
+    @check_user_is_authenticated()
     def confirmDelete(self, update: Update, context: CallbackContext):
         position = context.user_data["position"]
         title_to_remove = context.user_data['results'][position]['title']
         message = f"You sure you want to remove {title_to_remove} from your Library? 😱"
 
         keyboard = [
-            [self.buttons.yes_button()],
-            [self.buttons.no_button()]
+            [self._buttons.yes_button()],
+            [self._buttons.no_button()]
         ]
 
         reply_markup = InlineKeyboardMarkup(keyboard)
@@ -192,15 +175,15 @@ class SearchHandler:
         context.user_data["update_msg"] = msg.message_id
 
     @check_conversation(["update_msg", "type"])
-    @check_authentication(auth, config.lookarr)
+    @check_user_is_authenticated()
     def delete(self, update: Update, context: CallbackContext):
-        system = self.media_server_factory.getMediaServer(context.user_data["type"])
+        media_server = self._media_server_factory.getMediaServer(context.user_data["type"])
 
         position = context.user_data["position"]
         id_to_remove = context.user_data['results'][position]['id']
         title_to_remove = context.user_data['results'][position]['title']
 
-        contentRemoved = system.media_server.removeFromLibrary(id_to_remove)
+        contentRemoved = media_server.media_server.removeFromLibrary(id_to_remove)
 
         if contentRemoved:
             message = f"{title_to_remove} has been removed from your Library! 😤"
@@ -215,7 +198,7 @@ class SearchHandler:
         stop_handler.clearUserData(update, context, False)
         return ConversationHandler.END
 
-    @check_authentication(auth, config.lookarr)
+    @check_user_is_authenticated()
     def searchMedia(self, update: Update, context: CallbackContext) -> None | int:
         query = update.callback_query
         query.answer()
@@ -225,11 +208,11 @@ class SearchHandler:
         if stop_handler.lostTrackOfConversation(update, context, ["type", "reply"]):
             return ConversationHandler.END
 
-        system = self.media_server_factory.getMediaServer(context.user_data["type"])
+        media_server = self._media_server_factory.getMediaServer(context.user_data["type"])
 
         query.edit_message_text(text=f"Looking for '{context.user_data['reply']}'..👀")
 
-        results = system.media_server.search(context.user_data["reply"])
+        results = media_server.media_server.search(context.user_data["reply"])
 
         if not results:
             query.edit_message_text(text=f"Sorry, I couldn't fine any result for '{context.user_data['reply']}' 😔")
@@ -243,7 +226,7 @@ class SearchHandler:
 
         self.showMedias(update, context)
 
-    @check_authentication(auth, config.lookarr)
+    @check_user_is_authenticated()
     def showMedias(self, update: Update, context: CallbackContext):
         position = context.user_data["position"]
 
@@ -254,28 +237,28 @@ class SearchHandler:
             mgs = context.bot.send_message(chat_id=update.effective_message.chat_id, text=".. 👀")
             context.user_data["update_msg"] = mgs.message_id
 
-        system = self.media_server_factory.getMediaServer(context.user_data["type"])
+        media_server = self._media_server_factory.getMediaServer(context.user_data["type"])
 
-        results = [from_dict(data_class=system.data_type, data=entry) for entry in context.user_data['results']]
+        results = [from_dict(data_class=media_server.data_type, data=entry) for entry in context.user_data['results']]
 
         current = results[position]
         context.user_data["id"] = current.id
 
         if not current.is_in_library:
-            keyboard = [[self.buttons.add_button()]]
+            keyboard = [[self._buttons.add_button()]]
         elif current.hasFile:
-            keyboard = [[self.buttons.delete_button()]]
+            keyboard = [[self._buttons.delete_button()]]
         else:
-            keyboard = [[self.buttons.delete_button("Cancel Download")]]
+            keyboard = [[self._buttons.delete_button("Cancel Download")]]
 
         if len(results) > 1 and len(results) > position == 0:  # show next
-            keyboard.append([self.buttons.next_button()])
+            keyboard.append([self._buttons.next_button()])
         elif len(results) - 1 == position:  # show previous
-            keyboard.append([self.buttons.previous_button()])
+            keyboard.append([self._buttons.previous_button()])
         else:
-            keyboard.append([self.buttons.previous_button(), self.buttons.next_button()])
+            keyboard.append([self._buttons.previous_button(), self._buttons.next_button()])
 
-        keyboard.append([self.buttons.stop_button()])
+        keyboard.append([self._buttons.stop_button()])
         markup = InlineKeyboardMarkup(keyboard)
         message = f"\n\n<b>{current.title} ({current.year})</b>"
 
