@@ -35,8 +35,8 @@ class SearchHandler:
 
         update.message.reply_text("What you're looking for? 🧐:", reply_markup=reply_markup)
 
-    @check_conversation(["update_msg"])
     @check_user_is_authenticated()
+    @check_conversation(["update_msg"])
     def goToPreviousOrNextOption(self, update: Update, context: CallbackContext):
         query = update.callback_query
 
@@ -48,8 +48,8 @@ class SearchHandler:
 
         self.showMedias(update, context)
 
-    @check_conversation(["update_msg", "type"])
     @check_user_is_authenticated()
+    @check_conversation(["update_msg", "type"])
     def getFolders(self, update: Update, context: CallbackContext):
         query = update.callback_query
 
@@ -86,8 +86,8 @@ class SearchHandler:
 
         context.user_data["update_msg"] = msg.message_id
 
-    @check_conversation(["update_msg", "type"])
     @check_user_is_authenticated()
+    @check_conversation(["update_msg", "type"])
     def getQualityProfiles(self, update: Update, context: CallbackContext):
         query = update.callback_query
 
@@ -120,8 +120,8 @@ class SearchHandler:
 
         context.user_data["update_msg"] = msg.message_id
 
-    @check_conversation(["update_msg", "type"])
     @check_user_is_authenticated()
+    @check_conversation(["update_msg", "type"])
     def addToLibrary(self, update: Update, context: CallbackContext):
         query = update.callback_query
 
@@ -149,8 +149,8 @@ class SearchHandler:
         stop_handler.clearUserData(update, context)
         return ConversationHandler.END
 
-    @check_conversation(["update_msg", "type"])
     @check_user_is_authenticated()
+    @check_conversation(["update_msg", "type"])
     def confirmDelete(self, update: Update, context: CallbackContext):
         position = context.user_data["position"]
         title_to_remove = context.user_data['results'][position]['title']
@@ -174,8 +174,8 @@ class SearchHandler:
 
         context.user_data["update_msg"] = msg.message_id
 
-    @check_conversation(["update_msg", "type"])
     @check_user_is_authenticated()
+    @check_conversation(["update_msg", "type"])
     def delete(self, update: Update, context: CallbackContext):
         media_server = self._media_server_factory.getMediaServer(context.user_data["type"])
 
