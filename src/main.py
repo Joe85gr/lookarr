@@ -36,13 +36,13 @@ def main() -> None:
     updater = Updater(environ.get("TELEGRAM_BOT_KEY"))
 
     updater.dispatcher.add_handler(CommandHandler(config.lookarr.search_all_command, conversationHandler.search))
-    updater.dispatcher.add_handler(CallbackQueryHandler(conversationHandler.searchMedia, pattern="Movie"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(conversationHandler.goToPreviousOrNextOption,
+    updater.dispatcher.add_handler(CallbackQueryHandler(conversationHandler.search_media, pattern="Movie"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(conversationHandler.change_option,
                                                         pattern="Next|Previous"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(conversationHandler.getFolders, pattern="Add"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(conversationHandler.getQualityProfiles, pattern="Path"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(conversationHandler.addToLibrary, pattern="Quality"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(conversationHandler.confirmDelete,
+    updater.dispatcher.add_handler(CallbackQueryHandler(conversationHandler.get_folders, pattern="Add"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(conversationHandler.get_quality_profiles, pattern="Path"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(conversationHandler.add_to_library, pattern="Quality"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(conversationHandler.confirm_delete,
                                                         pattern="ConfirmDelete"))
     updater.dispatcher.add_handler(CallbackQueryHandler(conversationHandler.delete, pattern="Delete"))
     updater.dispatcher.add_handler(CallbackQueryHandler(stop_handler.stop, pattern="Stop"))
