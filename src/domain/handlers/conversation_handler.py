@@ -1,7 +1,7 @@
 from dacite import from_dict
 
 from src.domain.checkers.authentication_checker import check_user_is_authenticated
-from src.domain.checkers.conversation_checker import check_conversation
+from src.domain.checkers.conversation_checker import check_conversation, answer_query
 from src.domain.checkers.search_checker import check_search_is_valid
 from src.domain.handlers.messages_handler import MessagesHandler
 from src.domain.handlers.stop_handler import stop_handler
@@ -141,11 +141,11 @@ class SearchHandler:
         return ConversationHandler.END
 
     @check_user_is_authenticated()
+    @answer_query()
     def search_media(self, update: Update, context: CallbackContext) -> None | int:
         query = update.callback_query
-        query.answer()
 
-        context.user_data["type"] = query.data
+        context.user_data["type"] = update.callback_query.data
 
         if stop_handler.lostTrackOfConversation(update, context, ["type", "reply"]):
             return ConversationHandler.END

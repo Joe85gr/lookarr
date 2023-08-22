@@ -9,12 +9,20 @@ class check_conversation:
         self._required_keys = required_keys
 
     def __call__(self, func):
+        @answer_query()
         def wrapper(cls, update: Update, context: CallbackContext) -> object:
-            query = update.callback_query
-            query.answer()
-
             if stop_handler.lostTrackOfConversation(update, context, self._required_keys):
                 return ConversationHandler.END
+
+            return func(cls, update, context)
+
+        return wrapper
+
+
+class answer_query:
+    def __call__(self, func):
+        def wrapper(cls, update: Update, context: CallbackContext) -> object:
+            update.callback_query.answer()
 
             return func(cls, update, context)
 
