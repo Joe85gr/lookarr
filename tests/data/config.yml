@@ -1,0 +1,9 @@
+lookarr:
+  language: en-us
+  strict_mode_allowed_ids: [ 876898904 ]
+  search_all_command: search
+
+radarr:
+  enabled: True
+  url: 10.66.66.10
+  port: 7878
