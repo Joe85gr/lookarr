@@ -31,7 +31,7 @@ class Radarr(IMediaServerRepository):
             logger.error(f"Radarr error while searching {title} status code: {response.status_code}")
             return {}
 
-    def getMyLibrary(self) -> list[Movie]:
+    def get_my_library(self) -> list[Movie]:
         url = self.__generateApiQuery("movie/lookup")
         response = requests.get(url, headers={'X-Api-Key': str(os.environ.get("RADARR_API_KEY"))})
 
@@ -54,7 +54,7 @@ class Radarr(IMediaServerRepository):
                 url += "&" + key + "=" + value
         return url.replace(" ", "%20").replace("?&", "?")
 
-    def addToLibrary(self, id: int, path: str, qualityProfileId) -> bool:
+    def add_to_library(self, id: int, path: str, qualityProfileId) -> bool:
         parameters = {"tmdbId": str(id)}
         req = requests.get(
             self.__generateApiQuery("movie/lookup/tmdb", parameters),
@@ -71,7 +71,7 @@ class Radarr(IMediaServerRepository):
             logger.error(f"Radarr error while adding {id} status code: {add.status_code}, error: {add.text}")
             return False
 
-    def removeFromLibrary(self, id: int) -> bool:
+    def remove_from_library(self, id: int) -> bool:
         query = f'{self.__generateApiQuery(f"movie")}/{id}'
         req = requests.delete(
             query,
@@ -82,7 +82,7 @@ class Radarr(IMediaServerRepository):
             logger.error(f"Radarr error while removing {id} status code: {req.status_code}, error: {req.text}")
             return False
 
-    def getRootFolders(self):
+    def get_root_folders(self):
         req = requests.get(self.__generateApiQuery("Rootfolder"),
                            headers={'X-Api-Key': str(os.environ.get("RADARR_API_KEY"))})
 
@@ -92,7 +92,7 @@ class Radarr(IMediaServerRepository):
 
         return {}
 
-    def getQualityProfiles(self):
+    def get_quality_profiles(self):
         req = requests.get(self.__generateApiQuery("qualityProfile"),
                            headers={'X-Api-Key': str(os.environ.get("RADARR_API_KEY"))})
         parsed_json = json.loads(req.text)

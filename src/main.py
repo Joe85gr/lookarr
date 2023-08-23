@@ -2,22 +2,21 @@
 from os import environ, path, makedirs
 
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
-
+from src.constants import CONFIG_FULL_PATH
 from src.domain.handlers.conversation_handler import SearchHandler
-from src.domain.config.app_config import config
+from src.domain.config.app_config import ConfigLoader
 from src.domain.handlers.authentication_handler import AuthHandler
 from src.domain.handlers.help_handler import HelpHandler
 from src.domain.handlers.stop_handler import stop_handler
 from src.domain.validators.env_validator import EnvValidator
 from src.infrastructure.db.sqlite import db
 from src.infrastructure.media_server_factory import MediaServerFactory
+from src.interface.keyboard import Keyboard
 
-
-mediaServerFactory = MediaServerFactory()
+config = ConfigLoader(CONFIG_FULL_PATH)
 authenticationHandler = AuthHandler()
 helpHandler = HelpHandler()
-
-conversationHandler = SearchHandler(mediaServerFactory)
+conversationHandler = SearchHandler(MediaServerFactory(), Keyboard())
 
 
 def initialise() -> None:

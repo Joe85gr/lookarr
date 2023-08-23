@@ -9,7 +9,7 @@ class StopHandler:
     def __init__(self):
         self._logger = logger.name = __name__
 
-    @check_user_is_authenticated()
+    @check_user_is_authenticated
     def stop(self, update, context):
         self.clearUserData(update, context)
 
