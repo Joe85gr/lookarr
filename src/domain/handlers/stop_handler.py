@@ -1,5 +1,5 @@
 from src.domain.checkers.authentication_checker import check_user_is_authenticated
-from src.logger import logger
+from src.logger import Logger
 from telegram import Update
 from telegram.ext import CallbackContext, ConversationHandler
 from telegram.error import BadRequest
@@ -7,17 +7,17 @@ from telegram.error import BadRequest
 
 class StopHandler:
     def __init__(self):
-        self._logger = logger.name = __name__
+        self._logger = Logger(__name__)
 
-    @check_user_is_authenticated()
+    @check_user_is_authenticated
     def stop(self, update, context):
-        self.clearUserData(update, context)
+        self.clear_user_data(update, context)
 
         context.bot.send_message(chat_id=update.effective_message.chat_id, text="Ok, nothing to do for me then 🌝")
 
         return ConversationHandler.END
 
-    def clearUserData(self, update: Update, context: CallbackContext, delete_last_message=True):
+    def clear_user_data(self, update: Update, context: CallbackContext, delete_last_message=True):
         msg = update.effective_message
 
         if delete_last_message:
@@ -30,17 +30,17 @@ class StopHandler:
         items = [item for item in context.user_data]
         [context.user_data.pop(item) for item in items]
 
-    def lostTrackOfConversation(self, update: Update, context: CallbackContext, required_keys: list[str]) -> bool:
+    def lost_track_of_conversation(self, update: Update, context: CallbackContext, required_keys: list[str]) -> bool:
         for key in required_keys:
             if not key in context.user_data:
-                self.__sendLostTrackMessage(update, context)
-                self.clearUserData(update, context)
+                self._send_lost_track_message(update, context)
+                self.clear_user_data(update, context)
                 return True
 
         return False
 
     @staticmethod
-    def __sendLostTrackMessage(update: Update, context: CallbackContext):
+    def _send_lost_track_message(update: Update, context: CallbackContext):
         message = "Sorry, kinda lost track of the conversation.. 😅 try again!"
         context.bot.send_message(chat_id=update.effective_message.chat_id, text=message)
 

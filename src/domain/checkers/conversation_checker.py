@@ -11,7 +11,7 @@ class check_conversation:
     def __call__(self, func):
         @answer_query()
         def wrapper(cls, update: Update, context: CallbackContext) -> object:
-            if stop_handler.lostTrackOfConversation(update, context, self._required_keys):
+            if stop_handler.lost_track_of_conversation(update, context, self._required_keys):
                 return ConversationHandler.END
 
             return func(cls, update, context)

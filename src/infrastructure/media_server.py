@@ -11,23 +11,23 @@ class IMediaServerRepository(ABC):
         """Returns Search Results"""
 
     @abstractmethod
-    def getMyLibrary(self) -> list:
+    def get_my_library(self) -> list:
         """Returns Library Results"""
 
     @abstractmethod
-    def addToLibrary(self, id: int, path: str, qualityProfileId) -> bool:
+    def add_to_library(self, id: int, path: str, qualityProfileId) -> bool:
         """Adds Entry to Library"""
 
     @abstractmethod
-    def removeFromLibrary(self, id: int) -> bool:
+    def remove_from_library(self, id: int) -> bool:
         """Removes Entry from Library"""
 
     @abstractmethod
-    def getRootFolders(self):
+    def get_root_folders(self):
         """Returns List Folders where Media can  be stored"""
 
     @abstractmethod
-    def getQualityProfiles(self):
+    def get_quality_profiles(self):
         """Returns List Quality Profiles Set on the Library"""
 
 
