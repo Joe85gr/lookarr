@@ -14,7 +14,7 @@ class check_search_is_valid:
                 update.message.reply_text(
                     "Well, I'm unsure what you want me to search..🧐\nwrite /search <search criteria> "
                     "to get some results.")
-                stop_handler.clearUserData(update, context)
+                stop_handler.clear_user_data(update, context)
                 return ConversationHandler.END
 
             context.user_data["reply"] = user_reply.value

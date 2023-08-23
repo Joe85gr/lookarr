@@ -19,10 +19,9 @@ class Keyboard:
         return keyboard
 
     def quality_profiles(self, profiles:  list[QualityProfile]):
-        keyboard = [[self._buttons.quality_profile_button(profile)] for profile in profiles]
-        keyboard.append([[self._buttons.stop_button()]])
 
-        return keyboard
+        return [[self._buttons.quality_profile_button(profile)] for profile in profiles] \
+             + [[self._buttons.stop_button()]]
 
     def delete(self):
         keyboard = [

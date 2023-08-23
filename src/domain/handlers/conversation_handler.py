@@ -58,7 +58,7 @@ class SearchHandler:
                 update,
                 "I couldn't retrieve the available folders 😔 not much I can do really.."
             )
-            stop_handler.clearUserData(update, context)
+            stop_handler.clear_user_data(update, context)
             return ConversationHandler.END
 
         results = [from_dict(data_class=Folder, data=folder) for folder in folders]
@@ -108,7 +108,7 @@ class SearchHandler:
 
         MessagesHandler.update_message(context, update, message)
 
-        stop_handler.clearUserData(update, context)
+        stop_handler.clear_user_data(update, context)
         return ConversationHandler.END
 
     @check_user_is_authenticated
@@ -140,7 +140,7 @@ class SearchHandler:
 
         MessagesHandler.update_message(context, update, message)
 
-        stop_handler.clearUserData(update, context, False)
+        stop_handler.clear_user_data(update, context, False)
         return ConversationHandler.END
 
     @check_user_is_authenticated
@@ -150,7 +150,7 @@ class SearchHandler:
 
         context.user_data["type"] = update.callback_query.data
 
-        if stop_handler.lostTrackOfConversation(update, context, ["type", "reply"]):
+        if stop_handler.lost_track_of_conversation(update, context, ["type", "reply"]):
             return ConversationHandler.END
 
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
@@ -161,7 +161,7 @@ class SearchHandler:
 
         if not results:
             query.edit_message_text(text=f"Sorry, I couldn't fine any result for '{context.user_data['reply']}' 😔")
-            stop_handler.clearUserData(update, context, False)
+            stop_handler.clear_user_data(update, context, False)
             return ConversationHandler.END
 
         context.user_data["position"] = 0
