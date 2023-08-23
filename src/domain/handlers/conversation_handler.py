@@ -12,7 +12,7 @@ from src.infrastructure.folder import Folder
 from src.infrastructure.media_server_factory import IMediaServerFactory
 from src.infrastructure.quality_profiles import QualityProfile
 from src.interface.keyboard import Keyboard
-from src.logger import logger
+from src.logger import Logger
 
 
 class SearchHandler:
@@ -21,7 +21,7 @@ class SearchHandler:
             media_server_factory: IMediaServerFactory,
             keyboard: Keyboard,
     ):
-        self._logger = logger.name = __name__
+        self._logger = Logger(__name__)
         self._config = ConfigLoader()
         self._media_server_factory = media_server_factory
         self._keyboard = keyboard

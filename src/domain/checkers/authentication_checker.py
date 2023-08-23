@@ -3,9 +3,9 @@ from telegram.ext import CallbackContext, ConversationHandler
 
 from src.domain.auth.authentication import auth
 from src.domain.config.app_config import ConfigLoader
-from src.logger import logger
+from src.logger import Logger
 
-logger.name = __name__
+logger = Logger(__name__)
 
 
 def check_user_is_authenticated(func):

@@ -9,9 +9,9 @@ from src.domain.config.radarr_config import RadarrConfig
 from src.infrastructure.media_server import IMediaServerRepository
 from src.infrastructure.radarr.movie import Movie
 from urllib.parse import quote
-from src.logger import logger
+from src.logger import Logger
 
-logger.name = __name__
+logger = Logger(__name__)
 
 
 class Radarr(IMediaServerRepository):

@@ -3,12 +3,12 @@ from telegram.ext import CallbackContext, ConversationHandler
 from src.domain.auth.authentication import auth
 from src.domain.config.app_config import ConfigLoader
 from src.domain.user import UserReply
-from src.logger import logger
+from src.logger import Logger
 
 
 class AuthHandler:
     def __init__(self):
-        self._logger = logger.name = __name__
+        self._logger = Logger(__name__)
         self._config = ConfigLoader()
 
     def authenticate(self, update: Update, context: CallbackContext) -> None | int:
