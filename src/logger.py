@@ -7,16 +7,16 @@ from src.constants import LOG_FULL_PATH
 
 class Logger(object):
     _instance = None
-    _logger = None
+    logger = None
 
     def __new__(cls, name: str = None):
         if cls._instance is None:
             if name is None:
                 raise ValueError("Logger name cannot be None")
             cls._instance = super(Logger, cls).__new__(cls)
-            cls._logger = cls.get_logger(name)
-            cls._logger.info('Created logger')
-        return cls._logger
+            cls.logger = cls.get_logger(name)
+            cls.logger.info('Created logger')
+        return cls.logger
 
     @staticmethod
     def get_logger(name: str = None) -> logging.Logger:
