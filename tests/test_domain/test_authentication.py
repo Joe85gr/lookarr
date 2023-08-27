@@ -1,5 +1,5 @@
 import os
-from unittest.mock import patch, Mock
+from unittest.mock import patch, MagicMock
 from kink import di
 
 from src.domain.config.app_config import Config
@@ -7,8 +7,8 @@ from src.infrastructure.db.IDatabase import IDatabase
 from src.domain.config.lookarr_config import LookarrConfig
 import pytest
 
-mock_db = Mock()
-mock_config = Mock()
+mock_db = MagicMock()
+mock_config = MagicMock()
 
 di[IDatabase] = mock_db
 di[Config] = mock_config
