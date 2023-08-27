@@ -21,7 +21,7 @@ class Test_LookarrConfig:
         # Act
         result = LookarrConfig(
             language="en-us",
-            strict_mode_allowed_ids=[123],
+            strict_mode_allowed_ids=[1, 2],
             search_all_command="Search",
         )
 
@@ -36,7 +36,7 @@ class Test_LookarrConfig:
         with pytest.raises(ValueError) as result:
             LookarrConfig(
                 language="gibberish",
-                strict_mode_allowed_ids=[123],
+                strict_mode_allowed_ids=[1, 2],
                 search_all_command="Search",
             )
 

@@ -1,6 +1,6 @@
 lookarr:
   language: en-us
-  strict_mode_allowed_ids: [ 876898904 ]
+  strict_mode_allowed_ids: [ 1, 2 ]
   search_all_command: search
 
 radarr:

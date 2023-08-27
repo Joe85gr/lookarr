@@ -6,7 +6,7 @@ from kink import inject
 from src.domain.checkers.authentication_checker import check_user_is_authenticated
 from src.domain.checkers.conversation_checker import check_conversation, answer_query
 from src.domain.checkers.search_checker import check_search_is_valid
-from src.domain.config.app_config import ConfigLoader
+from src.domain.config.app_config import ConfigLoader, Config
 from src.domain.handlers.messages_handler import MessagesHandler
 from src.domain.handlers.stop_handler import stop_handler
 from src.infrastructure.folder import Folder
@@ -22,9 +22,10 @@ class SearchHandler:
             self,
             media_server_factory: IMediaServerFactory,
             logger: ILogger,
+            config: Config,
     ):
         self._logger = logger
-        self._config = ConfigLoader()
+        self._config = config
         self._media_server_factory = media_server_factory
 
     @check_user_is_authenticated

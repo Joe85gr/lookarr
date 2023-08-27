@@ -10,17 +10,12 @@ class Config(BaseModel):
     radarr: RadarrConfig
 
 
-class ConfigLoader(object):
-    _instance = None
-    _config = None
-
+class ConfigLoader:
     def __new__(cls, path: str = None):
-        if cls._instance is None:
-            if path is None:
-                raise ValueError("Path cannot be None")
-            cls._instance = super(ConfigLoader, cls).__new__(cls)
-            cls._config = cls._load_config(path)
-        return cls._config
+        if path is None:
+            raise ValueError("Path cannot be None")
+        cls._instance = super(ConfigLoader, cls).__new__(cls)
+        return cls._load_config(path)
 
     @staticmethod
     def _load_config(path: str) -> Config:

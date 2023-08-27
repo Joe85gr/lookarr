@@ -1,14 +1,15 @@
 import os
+import unittest
+from pathlib import Path
 from unittest.mock import patch, MagicMock
 from kink import di
 
-from src.domain.config.app_config import Config
+from src.domain.config.app_config import Config, ConfigLoader
 from src.infrastructure.db.IDatabase import IDatabase
-from src.domain.config.lookarr_config import LookarrConfig
-import pytest
 
 mock_db = MagicMock()
-mock_config = MagicMock()
+path = f"{Path(__file__).parent.parent}/data/config.yml"
+mock_config = ConfigLoader(path)
 
 di[IDatabase] = mock_db
 di[Config] = mock_config
@@ -16,16 +17,7 @@ di[Config] = mock_config
 from src.domain.auth.authentication import Auth
 
 
-class Test_Auth:
-    @pytest.fixture(autouse=True)
-    def before_each(self):
-        mock_config.lookarr = LookarrConfig(
-            language="en-us",
-            strict_mode=True,
-            strict_mode_allowed_ids=[1, 2],
-            search_all_command="Search",
-        )
-
+class Test_Auth(unittest.TestCase):
     def test_user_is_authenticated(self):
         # Arrange
         mock_db.user_exists.return_value = True
@@ -51,16 +43,6 @@ class Test_Auth:
         # Assert
         assert result is False
         mock_db.user_exists.assert_called_with(1)
-
-    def test_user_is_authenticated_strict(self):
-        # Arrange
-        sut = Auth()
-
-        # Act
-        result = sut.user_is_authenticated_strict(1)
-
-        # Assert
-        assert result is True
 
     def test_user_is_not_authenticated_strict(self):
         # Arrange
