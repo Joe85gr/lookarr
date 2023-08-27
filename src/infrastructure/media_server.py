@@ -1,11 +1,21 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Type
+from typing import Type, Protocol
 
 from src.infrastructure.media_type import TMediaType
 
 
-class IMediaServerRepository(ABC):
+class IMediaServerRepository(Protocol):
+    @property
+    @abstractmethod
+    def media_type_name(self) -> str:
+        """Returns type name of Media Server"""
+
+    @property
+    @abstractmethod
+    def media_type(self):
+        """Returns type of Media Server"""
+
     @abstractmethod
     def search(self, title: str = None, id: int = None) -> dict:
         """Returns Search Results"""

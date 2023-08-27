@@ -1,27 +1,45 @@
 import logging
 import os
+from abc import ABC, abstractmethod
 from pathlib import Path
 
 from src.constants import LOG_FULL_PATH
 
 
-class Logger(object):
-    _instance = None
-    logger = None
+class ILogger(ABC):
+    @abstractmethod
+    def info(self, message: str) -> None:
+        """Logs an info message"""
 
-    def __new__(cls, name: str = None):
-        if cls._instance is None:
-            if name is None:
-                raise ValueError("Logger name cannot be None")
-            cls._instance = super(Logger, cls).__new__(cls)
-            cls.logger = cls.get_logger(name)
-            cls.logger.info('Created logger')
-        return cls.logger
+    @abstractmethod
+    def debug(self, message: str) -> None:
+        """Logs a debug message"""
 
-    @staticmethod
-    def get_logger(name: str = None) -> logging.Logger:
-        logger = logging.getLogger(name)
-        logger.setLevel(logging.INFO)
+    @abstractmethod
+    def warning(self, message: str) -> None:
+        """Logs a warning message"""
+
+    @abstractmethod
+    def error(self, message: str) -> None:
+        """Logs an error message"""
+
+    @abstractmethod
+    def critical(self, message: str) -> None:
+        """Logs a critical message"""
+
+    @abstractmethod
+    def exception(self, message: str) -> None:
+        """Logs an exception message"""
+
+    @abstractmethod
+    def log(self, level: int, message: str) -> None:
+        """Logs a message at a given level"""
+
+
+class Logger(logging.Logger, ILogger):
+    def __init__(self, name: str):
+        super().__init__(name)
+        super().setLevel(logging.INFO)
 
         formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(module)s - %(message)s")
 
@@ -33,10 +51,8 @@ class Logger(object):
 
         file_handler = logging.FileHandler(relative_log_full_path)
         file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
+        super().addHandler(file_handler)
 
         console_handler = logging.StreamHandler()
         console_handler.setFormatter(formatter)
-        logger.addHandler(console_handler)
-
-        return logger
+        super().addHandler(console_handler)

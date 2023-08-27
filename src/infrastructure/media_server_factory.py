@@ -1,23 +1,18 @@
-from abc import abstractmethod, ABC
+from typing import List
 
-from src.domain.config.app_config import ConfigLoader
-from src.infrastructure.media_server import MediaServer
-from src.infrastructure.radarr.movie import Movie
-from src.infrastructure.radarr.radarr import Radarr
+from kink import inject
 
-
-class IMediaServerFactory(ABC):
-    @abstractmethod
-    def get_media_server(self, library_type: str) -> MediaServer:
-        """Returns Media Server"""
+from src.infrastructure.imedia_server_factory import IMediaServerFactory
+from src.infrastructure.media_server import MediaServer, IMediaServerRepository
 
 
+@inject
 class MediaServerFactory(IMediaServerFactory):
-    def __init__(self):
-        config = ConfigLoader().radarr
-        self._systems = {
-            "Movie": MediaServer(Radarr(config), Movie)
-        }
+    def __init__(self, media_servers: List[IMediaServerRepository]):
+        self._systems = {}
+
+        for media_server in media_servers:
+            self._systems[media_server.media_type_name] = MediaServer(media_server, media_server.media_type)
 
     def get_media_server(self, library_type: str) -> MediaServer:
         return self._systems[library_type]

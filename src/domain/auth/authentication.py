@@ -1,44 +1,30 @@
 import os
-from threading import Lock
-from src.domain.config.lookarr_config import LookarrConfig
-from src.infrastructure.db.sqlite import db
+
+from kink import inject
+
+from src.domain.auth.iauthentication import IAuth
+from src.domain.config.app_config import Config
+from src.infrastructure.db.IDatabase import IDatabase
 
 
-class Auth:
-    _instance = None
-    _lock = Lock()
+@inject
+class Auth(IAuth):
+    def __init__(self, db: IDatabase, config: Config):
+        self._db = db
+        self._config = config.lookarr
 
-    def __new__(cls, *args, **kwargs):
-        with cls._lock:
-            if not cls._instance:
-                cls._instance = super(Auth, cls).__new__(cls)
-                cls._instance._initialized = False
-        return cls._instance
-
-    def __init__(self) -> None:
-        with self._lock:
-            if self._initialized:
-                return
-            self._initialized = True
-
-    @staticmethod
-    def user_is_authenticated_strict(user_id: int, config: LookarrConfig):
-        if config.strict_mode and user_id not in config.strict_mode_allowed_ids:
+    def user_is_authenticated_strict(self, user_id: int):
+        if self._config.strict_mode and user_id not in self._config.strict_mode_allowed_ids:
             return False
         return True
 
-    @staticmethod
-    def user_is_authenticated(user_id: int) -> bool:
-        exists = db.user_exists(user_id)
+    def user_is_authenticated(self, user_id: int) -> bool:
+        exists = self._db.user_exists(user_id)
         return True if exists else False
 
-    @staticmethod
-    def authenticate_user(user_id, password) -> bool:
+    def authenticate_user(self, user_id, password) -> bool:
         if password == os.environ.get("LOOKARR_AUTH_PASSWORD"):
-            db.add_user(user_id)
+            self._db.add_user(user_id)
             return True
 
         return False
-
-
-auth = Auth()

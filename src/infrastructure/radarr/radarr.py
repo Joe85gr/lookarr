@@ -1,22 +1,31 @@
 import os
 
 from dacite import from_dict
+from kink import inject
+import requests
 import json
 
-import requests
 
-from src.domain.config.radarr_config import RadarrConfig
+from src.domain.config.app_config import Config
 from src.infrastructure.media_server import IMediaServerRepository
 from src.infrastructure.radarr.movie import Movie
 from urllib.parse import quote
-from src.logger import Logger
-
-logger = Logger(__name__)
+from src.logger import ILogger
 
 
+@inject
 class Radarr(IMediaServerRepository):
-    def __init__(self, config: RadarrConfig):
-        self.config = config
+    def __init__(self, logger: ILogger, config: Config):
+        self.config = config.radarr
+        self._logger = logger
+
+    @property
+    def media_type_name(self) -> str:
+        return "Movie"
+
+    @property
+    def media_type(self):
+        return Movie
 
     def search(self, title: str = None, tmdbid: int = None) -> dict:
 
@@ -28,7 +37,7 @@ class Radarr(IMediaServerRepository):
             parsed_json = json.loads(response.text)
             return parsed_json
         else:
-            logger.error(f"Radarr error while searching {title} status code: {response.status_code}")
+            self._logger.error(f"Radarr error while searching {title} status code: {response.status_code}")
             return {}
 
     def get_my_library(self) -> list[Movie]:
@@ -68,7 +77,7 @@ class Radarr(IMediaServerRepository):
         if add.status_code == 201:
             return True
         else:
-            logger.error(f"Radarr error while adding {id} status code: {add.status_code}, error: {add.text}")
+            self._logger.error(f"Radarr error while adding {id} status code: {add.status_code}, error: {add.text}")
             return False
 
     def remove_from_library(self, id: int) -> bool:
@@ -79,7 +88,7 @@ class Radarr(IMediaServerRepository):
         if req.status_code == 200:
             return True
         else:
-            logger.error(f"Radarr error while removing {id} status code: {req.status_code}, error: {req.text}")
+            self._logger.error(f"Radarr error while removing {id} status code: {req.status_code}, error: {req.text}")
             return False
 
     def get_root_folders(self):

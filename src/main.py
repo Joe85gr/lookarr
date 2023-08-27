@@ -1,25 +1,29 @@
 #!/usr/bin/env python
+
+from dependencies.di import di
+
 from os import environ, path, makedirs
 
+from kink import inject
+from src.infrastructure.db.IDatabase import IDatabase
+
+
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
-from src.constants import CONFIG_FULL_PATH
 from src.domain.handlers.conversation_handler import SearchHandler
-from src.domain.config.app_config import ConfigLoader
+from src.domain.config.app_config import Config
 from src.domain.handlers.authentication_handler import AuthHandler
 from src.domain.handlers.help_handler import HelpHandler
 from src.domain.handlers.stop_handler import stop_handler
 from src.domain.validators.env_validator import EnvValidator
-from src.infrastructure.db.sqlite import db
-from src.infrastructure.media_server_factory import MediaServerFactory
-from src.interface.keyboard import Keyboard
 
-config = ConfigLoader(CONFIG_FULL_PATH)
+
 authenticationHandler = AuthHandler()
 helpHandler = HelpHandler()
-conversationHandler = SearchHandler(MediaServerFactory(), Keyboard())
+conversationHandler = SearchHandler()
 
 
-def initialise() -> None:
+@inject
+def initialise(db: IDatabase, config: Config) -> None:
     if not path.exists("logs"):
         makedirs("logs")
 
@@ -31,7 +35,9 @@ def initialise() -> None:
             f"Unable to start app as the following required env variables are missing: {''.join(env.reasons)}")
 
 
-def main() -> None:
+@inject
+def main(config: Config) -> None:
+
     updater = Updater(environ.get("TELEGRAM_BOT_KEY"))
 
     updater.dispatcher.add_handler(CommandHandler(config.lookarr.search_all_command, conversationHandler.search))
