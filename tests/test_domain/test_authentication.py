@@ -1,5 +1,4 @@
 import os
-import unittest
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 from kink import di
@@ -17,7 +16,7 @@ di[Config] = mock_config
 from src.domain.auth.authentication import Auth
 
 
-class Test_Auth(unittest.TestCase):
+class Test_Auth:
     def test_user_is_authenticated(self):
         # Arrange
         mock_db.user_exists.return_value = True
@@ -43,6 +42,16 @@ class Test_Auth(unittest.TestCase):
         # Assert
         assert result is False
         mock_db.user_exists.assert_called_with(1)
+
+    def test_user_is_authenticated_strict(self):
+        # Arrange
+        sut = Auth()
+
+        # Act
+        result = sut.user_is_authenticated_strict(1)
+
+        # Assert
+        assert result is True
 
     def test_user_is_not_authenticated_strict(self):
         # Arrange

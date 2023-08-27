@@ -1,14 +1,16 @@
 import os
 import json
-from unittest.mock import Mock, MagicMock
+from pathlib import Path
+from unittest.mock import Mock
 import pytest
 from kink import di
 
-from src.domain.config.app_config import Config
+from src.domain.config.app_config import Config, ConfigLoader
 from src.domain.config.radarr_config import RadarrConfig
 from src.logger import ILogger
 
-mock_config = MagicMock()
+path = f"{Path(__file__).parent.parent.parent}/data/config.yml"
+mock_config = ConfigLoader(path)
 di[Config] = mock_config
 di[ILogger] = Mock()
 
