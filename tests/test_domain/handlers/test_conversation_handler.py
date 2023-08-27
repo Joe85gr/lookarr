@@ -22,7 +22,7 @@ class Test_SearchHandler:
         context = Mock()
         update.callback_query = Mock()
         path = f"{Path(__file__).parent.parent.parent}/data/config.yml"
-        ConfigLoader(path)
+        ConfigLoader.load_config(path)
 
         test_cases = [
             {"query": "Next", "expected_result": 3},

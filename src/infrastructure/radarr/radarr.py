@@ -1,11 +1,8 @@
 import os
-
 from dacite import from_dict
 from kink import inject
-import requests
 import json
-
-
+import requests
 from src.domain.config.app_config import Config
 from src.infrastructure.interfaces.imedia_server import IMediaServerRepository
 from src.infrastructure.radarr.movie import Movie
@@ -15,9 +12,10 @@ from src.logger import ILogger
 
 @inject
 class Radarr(IMediaServerRepository):
-    def __init__(self, logger: ILogger, config: Config):
+    def __init__(self, logger: ILogger, config: Config, client: requests):
         self.config = config.radarr
         self._logger = logger
+        self._requests = client
 
     @property
     def media_type_name(self) -> str:
@@ -31,18 +29,17 @@ class Radarr(IMediaServerRepository):
 
         parameters = {"term": f"tmdb:{tmdbid}" if tmdbid else quote(title)}
         url = self._generate_api_query("movie/lookup", parameters)
-        response = requests.get(url, headers={'X-Api-Key': str(os.environ.get("RADARR_API_KEY"))})
+        response = self._requests.get(url, headers={'X-Api-Key': str(os.environ.get("RADARR_API_KEY"))})
 
         if response.status_code == 200:
-            parsed_json = json.loads(response.text)
-            return parsed_json
+            return response.json()
         else:
             self._logger.error(f"Radarr error while searching {title} status code: {response.status_code}")
             return {}
 
     def get_my_library(self) -> list[Movie]:
         url = self._generate_api_query("movie/lookup")
-        response = requests.get(url, headers={'X-Api-Key': str(os.environ.get("RADARR_API_KEY"))})
+        response = self._requests.get(url, headers={'X-Api-Key': str(os.environ.get("RADARR_API_KEY"))})
 
         if response.status_code == 200:
             parsed_json = json.loads(response.text)
@@ -65,14 +62,14 @@ class Radarr(IMediaServerRepository):
 
     def add_to_library(self, id: int, path: str, qualityProfileId) -> bool:
         parameters = {"tmdbId": str(id)}
-        req = requests.get(
+        req = self._requests.get(
             self._generate_api_query("movie/lookup/tmdb", parameters),
             headers={'X-Api-Key': str(os.environ.get("RADARR_API_KEY"))}
         )
         parsed_json = json.loads(req.text)
         data = json.dumps(self.build_data(parsed_json, path, qualityProfileId))
-        add = requests.post(self._generate_api_query("movie"), data=data,
-                            headers={'Content-Type': 'application/json',
+        add = self._requests.post(self._generate_api_query("movie"), data=data,
+                                  headers={'Content-Type': 'application/json',
                                      'X-Api-Key': str(os.environ.get("RADARR_API_KEY"))})
         if add.status_code == 201:
             return True
@@ -82,7 +79,7 @@ class Radarr(IMediaServerRepository):
 
     def remove_from_library(self, id: int) -> bool:
         query = f'{self._generate_api_query(f"movie")}/{id}'
-        req = requests.delete(
+        req = self._requests.delete(
             query,
             headers={'X-Api-Key': str(os.environ.get("RADARR_API_KEY"))})
         if req.status_code == 200:
@@ -92,8 +89,8 @@ class Radarr(IMediaServerRepository):
             return False
 
     def get_root_folders(self):
-        req = requests.get(self._generate_api_query("Rootfolder"),
-                           headers={'X-Api-Key': str(os.environ.get("RADARR_API_KEY"))})
+        req = self._requests.get(self._generate_api_query("Rootfolder"),
+                                 headers={'X-Api-Key': str(os.environ.get("RADARR_API_KEY"))})
 
         if req.status_code == 200:
             parsed_json = json.loads(req.text)
@@ -102,8 +99,8 @@ class Radarr(IMediaServerRepository):
         return {}
 
     def get_quality_profiles(self):
-        req = requests.get(self._generate_api_query("qualityProfile"),
-                           headers={'X-Api-Key': str(os.environ.get("RADARR_API_KEY"))})
+        req = self._requests.get(self._generate_api_query("qualityProfile"),
+                                 headers={'X-Api-Key': str(os.environ.get("RADARR_API_KEY"))})
         parsed_json = json.loads(req.text)
         return parsed_json
 

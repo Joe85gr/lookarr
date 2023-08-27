@@ -4,7 +4,7 @@ from src.logger import ILogger, Logger
 di[ILogger] = Logger(__name__)
 
 from typing import List
-
+import requests
 from src.constants import CONFIG_FULL_PATH
 from src.domain.config.app_config import ConfigLoader, Config
 from src.domain.handlers.help_handler import HelpHandler
@@ -29,6 +29,7 @@ def configure_services() -> None:
     di[Config] = ConfigLoader.load_config(CONFIG_FULL_PATH)
     di[IDatabase] = Database()
     di[IAuth] = Auth()
+    di["client"] = requests
 
     di[List[IMediaServerRepository]] = [
         Radarr()
