@@ -3,7 +3,7 @@
 from os import environ, path, makedirs
 
 from kink import inject
-from src.dependencies.di import configure_services
+from src.dependencies.services import configure_services
 
 from src.domain.handlers.interfaces.iauthentication_handler import IAuthHandler
 from src.domain.handlers.interfaces.iconversation_handler import ISearchHandler
