@@ -1,5 +1,7 @@
 import sqlite3
 from kink import inject
+
+from src.constants import LOOKAR_DB_PATH
 from src.infrastructure.interfaces.IDatabase import IDatabase
 
 
@@ -7,7 +9,7 @@ from src.infrastructure.interfaces.IDatabase import IDatabase
 class Database(IDatabase):
     @staticmethod
     def initialise() -> None:
-        with sqlite3.connect("user_config/lookar.db") as con:
+        with sqlite3.connect(LOOKAR_DB_PATH) as con:
             cur = con.cursor()
 
             cur.execute(""" CREATE TABLE IF NOT EXISTS AUTHENTICATED_USERS (
@@ -17,7 +19,7 @@ class Database(IDatabase):
 
     @staticmethod
     def add_user(user: int) -> None:
-        with sqlite3.connect("user_config/lookar.db") as con:
+        with sqlite3.connect(LOOKAR_DB_PATH) as con:
             cur = con.cursor()
             data = (user, )
             cur.execute(f""" INSERT INTO AUTHENTICATED_USERS (chat_id)
@@ -26,7 +28,7 @@ class Database(IDatabase):
 
     @staticmethod
     def user_exists(user: int):
-        with sqlite3.connect("user_config/lookar.db") as con:
+        with sqlite3.connect(LOOKAR_DB_PATH) as con:
             cur = con.cursor()
             data = (user, )
             cur.execute(f""" SELECT * FROM AUTHENTICATED_USERS
