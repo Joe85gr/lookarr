@@ -2,9 +2,9 @@ import os
 
 from kink import inject
 
-from src.domain.auth.iauthentication import IAuth
+from src.domain.auth.interfaces.iauthentication import IAuth
 from src.domain.config.app_config import Config
-from src.infrastructure.db.IDatabase import IDatabase
+from src.infrastructure.interfaces.IDatabase import IDatabase
 
 
 @inject

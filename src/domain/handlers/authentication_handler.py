@@ -2,14 +2,15 @@ from telegram import Update
 from telegram.ext import CallbackContext, ConversationHandler
 from kink import inject
 
-from src.domain.auth.iauthentication import IAuth
+from src.domain.auth.interfaces.iauthentication import IAuth
 from src.domain.config.app_config import Config
+from src.domain.handlers.interfaces.iauthentication_handler import IAuthHandler
 from src.domain.user import UserReply
 from src.logger import ILogger
 
 
 @inject
-class AuthHandler:
+class AuthHandler(IAuthHandler):
     def __init__(self, auth: IAuth, logger: ILogger, config: Config):
         self._logger = logger
         self._config = config
@@ -19,7 +20,7 @@ class AuthHandler:
         user = update.effective_user
         user_reply = UserReply(update.message.text)
 
-        if not self._auth.user_is_authenticated_strict(user.id, self._config.lookarr):
+        if not self._auth.user_is_authenticated_strict(user.id):
             self._logger.info(f"unauthorised user {user.id}. Won't reply :D")
             return ConversationHandler.END
         elif self._auth.user_is_authenticated(user.id):

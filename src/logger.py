@@ -20,7 +20,7 @@ class ILogger(ABC):
         """Logs a warning message"""
 
     @abstractmethod
-    def error(self, message: str) -> None:
+    def error(self, message: str, e: Exception = None) -> None:
         """Logs an error message"""
 
     @abstractmethod

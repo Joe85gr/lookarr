@@ -2,7 +2,7 @@ from telegram import Update
 from telegram.ext import CallbackContext, ConversationHandler
 from kink import inject
 
-from src.domain.auth.iauthentication import IAuth
+from src.domain.auth.interfaces.iauthentication import IAuth
 from src.logger import ILogger
 
 

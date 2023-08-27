@@ -4,7 +4,7 @@ from unittest.mock import patch, MagicMock
 from kink import di
 
 from src.domain.config.app_config import Config, ConfigLoader
-from src.infrastructure.db.IDatabase import IDatabase
+from src.infrastructure.interfaces.IDatabase import IDatabase
 
 mock_db = MagicMock()
 path = f"{Path(__file__).parent.parent}/data/config.yml"

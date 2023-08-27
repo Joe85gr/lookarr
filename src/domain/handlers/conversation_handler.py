@@ -6,18 +6,19 @@ from kink import inject
 from src.domain.checkers.authentication_checker import check_user_is_authenticated
 from src.domain.checkers.conversation_checker import check_conversation, answer_query
 from src.domain.checkers.search_checker import check_search_is_valid
-from src.domain.config.app_config import ConfigLoader, Config
+from src.domain.config.app_config import Config
+from src.domain.handlers.interfaces.iconversation_handler import ISearchHandler
 from src.domain.handlers.messages_handler import MessagesHandler
 from src.domain.handlers.stop_handler import stop_handler
 from src.infrastructure.folder import Folder
-from src.infrastructure.imedia_server_factory import IMediaServerFactory
+from src.infrastructure.interfaces.imedia_server_factory import IMediaServerFactory
 from src.infrastructure.quality_profiles import QualityProfile
 from src.interface.keyboard import Keyboard
 from src.logger import ILogger
 
 
 @inject
-class SearchHandler:
+class SearchHandler(ISearchHandler):
     def __init__(
             self,
             media_server_factory: IMediaServerFactory,

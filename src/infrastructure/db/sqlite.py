@@ -1,6 +1,6 @@
 import sqlite3
 from kink import inject
-from src.infrastructure.db.IDatabase import IDatabase
+from src.infrastructure.interfaces.IDatabase import IDatabase
 
 
 @inject

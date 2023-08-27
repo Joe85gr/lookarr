@@ -7,7 +7,7 @@ import json
 
 
 from src.domain.config.app_config import Config
-from src.infrastructure.media_server import IMediaServerRepository
+from src.infrastructure.interfaces.imedia_server import IMediaServerRepository
 from src.infrastructure.radarr.movie import Movie
 from urllib.parse import quote
 from src.logger import ILogger
