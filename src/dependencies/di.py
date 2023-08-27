@@ -1,16 +1,14 @@
-from kink import di, inject
+from kink import di
 from src.logger import ILogger, Logger
 
 di[ILogger] = Logger(__name__)
 
 from typing import List
-from os import path, makedirs
 
 from src.constants import CONFIG_FULL_PATH
 from src.domain.config.app_config import ConfigLoader, Config
 from src.domain.handlers.help_handler import HelpHandler
 from src.domain.handlers.interfaces.ihelp_handler import IHelpHandler
-from src.domain.validators.env_validator import EnvValidator
 from src.infrastructure.interfaces.IDatabase import IDatabase
 from src.infrastructure.db.sqlite import Database
 from src.infrastructure.interfaces.imedia_server_factory import IMediaServerFactory
@@ -27,25 +25,17 @@ from src.domain.handlers.interfaces.istop_handler import IStopHandler
 from src.domain.handlers.stop_handler import StopHandler
 
 
-di[Config] = ConfigLoader.load_config(CONFIG_FULL_PATH)
-di[IDatabase] = Database()
-di[IAuth] = Auth()
-di[List[IMediaServerRepository]] = [Radarr()]
-di[IMediaServerFactory] = MediaServerFactory()
-di[IAuthHandler] = AuthHandler()
-di[ISearchHandler] = SearchHandler()
-di[IStopHandler] = StopHandler()
-di[IHelpHandler] = HelpHandler()
+def configure_services() -> None:
+    di[Config] = ConfigLoader.load_config(CONFIG_FULL_PATH)
+    di[IDatabase] = Database()
+    di[IAuth] = Auth()
 
+    di[List[IMediaServerRepository]] = [
+        Radarr()
+    ]
 
-@inject
-def initialise(db: IDatabase, config: Config) -> None:
-    if not path.exists("logs"):
-        makedirs("logs")
-
-    db.initialise()
-    env = EnvValidator()
-    env.verify_required_env_variables_exist(config.radarr.enabled)
-    if not env.is_valid:
-        raise ValueError(
-            f"Unable to start app as the following required env variables are missing: {''.join(env.reasons)}")
+    di[IMediaServerFactory] = MediaServerFactory()
+    di[IAuthHandler] = AuthHandler()
+    di[ISearchHandler] = SearchHandler()
+    di[IStopHandler] = StopHandler()
+    di[IHelpHandler] = HelpHandler()

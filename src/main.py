@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-from os import environ
+from os import environ, path, makedirs
 
 from kink import inject
-from src.dependencies.di import initialise
+from src.dependencies.di import configure_services
 
 from src.domain.handlers.interfaces.iauthentication_handler import IAuthHandler
 from src.domain.handlers.interfaces.iconversation_handler import ISearchHandler
@@ -12,6 +12,21 @@ from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 from src.domain.config.app_config import Config
 from src.domain.handlers.interfaces.ihelp_handler import IHelpHandler
 from src.domain.handlers.interfaces.istop_handler import IStopHandler
+from src.domain.validators.env_validator import EnvValidator
+from src.infrastructure.interfaces.IDatabase import IDatabase
+
+
+@inject
+def initialise(db: IDatabase, config: Config) -> None:
+    if not path.exists("logs"):
+        makedirs("logs")
+
+    db.initialise()
+    env = EnvValidator()
+    env.verify_required_env_variables_exist(config.radarr.enabled)
+    if not env.is_valid:
+        raise ValueError(
+            f"Unable to start app as the following required env variables are missing: {''.join(env.reasons)}")
 
 
 @inject
@@ -47,5 +62,6 @@ def main(
 
 
 if __name__ == '__main__':
+    configure_services()
     initialise()
     main()
