@@ -26,7 +26,8 @@ from src.domain.handlers.interfaces.iconversation_handler import ISearchHandler
 from src.domain.handlers.interfaces.istop_handler import IStopHandler
 from src.domain.handlers.stop_handler import StopHandler
 
-di[Config] = ConfigLoader(CONFIG_FULL_PATH)
+
+di[Config] = ConfigLoader.load_config(CONFIG_FULL_PATH)
 di[IDatabase] = Database()
 di[IAuth] = Auth()
 di[List[IMediaServerRepository]] = [Radarr()]
