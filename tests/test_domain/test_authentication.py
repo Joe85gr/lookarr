@@ -8,7 +8,7 @@ from src.infrastructure.interfaces.IDatabase import IDatabase
 
 mock_db = MagicMock()
 path = f"{Path(__file__).parent.parent}/data/config.yml"
-mock_config = ConfigLoader(path)
+mock_config = ConfigLoader.load_config(path)
 
 di[IDatabase] = mock_db
 di[Config] = mock_config
