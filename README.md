@@ -1,7 +1,7 @@
 # Lookarr
 Telegram bot for managing Sonarr and Radarr. 
 
--- Still under development. --
+-- Sonarr Still under development. --
 
 ## Overview
 ![Lookarr_Add](./imgs/banner_add.png)

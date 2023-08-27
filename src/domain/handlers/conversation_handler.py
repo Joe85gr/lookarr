@@ -1,35 +1,38 @@
 from telegram import Update
 from dacite import from_dict
 from telegram.ext import CallbackContext, ConversationHandler
+from kink import inject
 
 from src.domain.checkers.authentication_checker import check_user_is_authenticated
 from src.domain.checkers.conversation_checker import check_conversation, answer_query
 from src.domain.checkers.search_checker import check_search_is_valid
-from src.domain.config.app_config import ConfigLoader
+from src.domain.config.app_config import Config
+from src.domain.handlers.interfaces.iconversation_handler import ISearchHandler
 from src.domain.handlers.messages_handler import MessagesHandler
 from src.domain.handlers.stop_handler import stop_handler
 from src.infrastructure.folder import Folder
-from src.infrastructure.media_server_factory import IMediaServerFactory
+from src.infrastructure.interfaces.imedia_server_factory import IMediaServerFactory
 from src.infrastructure.quality_profiles import QualityProfile
 from src.interface.keyboard import Keyboard
-from src.logger import Logger
+from src.logger import ILogger
 
 
-class SearchHandler:
+@inject
+class SearchHandler(ISearchHandler):
     def __init__(
             self,
             media_server_factory: IMediaServerFactory,
-            keyboard: Keyboard,
+            logger: ILogger,
+            config: Config,
     ):
-        self._logger = Logger(__name__)
-        self._config = ConfigLoader()
+        self._logger = logger
+        self._config = config
         self._media_server_factory = media_server_factory
-        self._keyboard = keyboard
 
     @check_user_is_authenticated
     @check_search_is_valid()
     def search(self, update: Update, context: CallbackContext):
-        keyboard = self._keyboard.search()
+        keyboard = Keyboard.search()
 
         MessagesHandler.new_message(update, "What you're looking for? 🧐:", keyboard)
 
@@ -63,7 +66,7 @@ class SearchHandler:
 
         results = [from_dict(data_class=Folder, data=folder) for folder in folders]
 
-        keyboard = self._keyboard.folders(results)
+        keyboard = Keyboard.folders(results)
 
         MessagesHandler.update_message(context, update, "Select Download Path:", keyboard)
 
@@ -81,7 +84,7 @@ class SearchHandler:
 
         results = [from_dict(data_class=QualityProfile, data=entry) for entry in qualityProfiles]
 
-        keyboard = self._keyboard.quality_profiles(results)
+        keyboard = Keyboard.quality_profiles(results)
 
         MessagesHandler.update_message(context, update, "Select Quality Profile:", keyboard)
 
@@ -118,7 +121,7 @@ class SearchHandler:
         title_to_remove = context.user_data['results'][position]['title']
         message = f"You sure you want to remove {title_to_remove} from your Library? 😱"
 
-        keyboard = self._keyboard.delete()
+        keyboard = Keyboard.delete()
 
         MessagesHandler.update_message(context, update, message, keyboard)
 
@@ -185,7 +188,7 @@ class SearchHandler:
         current = results[position]
         context.user_data["id"] = current.id
 
-        keyboard = self._keyboard.medias(current.is_in_library, current.hasFile, len(results), position)
+        keyboard = Keyboard.medias(current.is_in_library, current.hasFile, len(results), position)
 
         message = f"\n\n<b>{current.title} ({current.year})</b>"
 

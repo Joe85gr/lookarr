@@ -1,13 +1,16 @@
-from src.domain.checkers.authentication_checker import check_user_is_authenticated
-from src.logger import Logger
 from telegram import Update
 from telegram.ext import CallbackContext, ConversationHandler
 from telegram.error import BadRequest
+from kink import inject
+
+from src.domain.checkers.authentication_checker import check_user_is_authenticated
+from src.logger import ILogger
 
 
+@inject
 class StopHandler:
-    def __init__(self):
-        self._logger = Logger(__name__)
+    def __init__(self, logger: ILogger):
+        self._logger = logger
 
     @check_user_is_authenticated
     def stop(self, update, context):

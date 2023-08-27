@@ -1,6 +1,10 @@
 from pathlib import Path
 from unittest.mock import Mock, patch, MagicMock
 
+from kink import di
+from src.logger import ILogger
+di[ILogger] = Mock()
+
 from tests.mockers.mock_decorators import mock_check_user_is_authenticated, mock_check_check_conversation
 
 mock_check_user_is_authenticated()
@@ -8,7 +12,6 @@ mock_check_check_conversation()
 
 from src.domain.config.app_config import ConfigLoader
 from src.domain.handlers.conversation_handler import SearchHandler
-from src.interface.keyboard import Keyboard
 
 
 class Test_SearchHandler:
@@ -30,7 +33,7 @@ class Test_SearchHandler:
             context.user_data = {"position": 2}
             update.callback_query.data = test_case["query"]
 
-            sut = SearchHandler(Mock(), Keyboard())
+            sut = SearchHandler(Mock())
 
             # Act
             sut.change_option(update, context)
