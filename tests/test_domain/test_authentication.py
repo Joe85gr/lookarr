@@ -1,19 +1,13 @@
 import os
-from pathlib import Path
 from unittest.mock import patch, MagicMock
 from kink import di
 
-from src.domain.config.app_config import Config, ConfigLoader
 from src.infrastructure.interfaces.IDatabase import IDatabase
+from src.domain.auth.authentication import Auth
+
 
 mock_db = MagicMock()
-path = f"{Path(__file__).parent.parent}/data/config.yml"
-mock_config = ConfigLoader.load_config(path)
-
 di[IDatabase] = mock_db
-di[Config] = mock_config
-
-from src.domain.auth.authentication import Auth
 
 
 class Test_Auth:

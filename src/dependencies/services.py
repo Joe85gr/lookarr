@@ -1,8 +1,4 @@
 from kink import di
-from src.logger import ILogger, Logger
-
-di[ILogger] = Logger(__name__)
-
 from typing import List
 import requests
 from src.constants import CONFIG_FULL_PATH

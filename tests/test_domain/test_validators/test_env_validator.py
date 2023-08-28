@@ -1,5 +1,4 @@
 import os
-
 import pytest
 
 from src.domain.validators.env_validator import EnvValidator
