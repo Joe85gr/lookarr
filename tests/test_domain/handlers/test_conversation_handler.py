@@ -1,16 +1,9 @@
-from pathlib import Path
 from unittest.mock import Mock, patch, MagicMock
-
-from kink import di
-from src.logger import ILogger
-di[ILogger] = Mock()
-
 from tests.mockers.mock_decorators import mock_check_user_is_authenticated, mock_check_check_conversation
 
 mock_check_user_is_authenticated()
 mock_check_check_conversation()
 
-from src.domain.config.app_config import ConfigLoader
 from src.domain.handlers.conversation_handler import SearchHandler
 
 
@@ -21,8 +14,6 @@ class Test_SearchHandler:
         update = Mock()
         context = Mock()
         update.callback_query = Mock()
-        path = f"{Path(__file__).parent.parent.parent}/data/config.yml"
-        ConfigLoader.load_config(path)
 
         test_cases = [
             {"query": "Next", "expected_result": 3},
