@@ -1,8 +1,7 @@
-from abc import abstractmethod
-from typing import Protocol
+from abc import abstractmethod, ABC
 
 
-class IMediaServerRepository(Protocol):
+class IMediaServerRepository(ABC):
     @property
     @abstractmethod
     def media_type_name(self) -> str:
