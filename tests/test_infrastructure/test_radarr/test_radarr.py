@@ -1,6 +1,6 @@
 import os
-from unittest.mock import MagicMock
 import pytest
+from unittest.mock import MagicMock
 from kink import di
 from requests import Response
 
