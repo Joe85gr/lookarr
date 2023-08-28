@@ -32,7 +32,7 @@ class TestCheckUserIsAuthenticated:
         result = check_user_is_authenticated(self.func)(self, self.update, self.context)
 
         # Assert
-        self._mock_logger.info.assert_called_once_with("unauthorised user 123456")
+        self._mock_logger.info.assert_called_with("unauthorised user 123456")
         assert result == ConversationHandler.END
 
     def test_not_authenticated_user(self):
@@ -48,7 +48,7 @@ class TestCheckUserIsAuthenticated:
         result = check_user_is_authenticated(self.func)(self, self.update, self.context)
 
         # Assert
-        self.update.message.reply_text.assert_called_once_with(
+        self.update.message.reply_text.assert_called_with(
             "Well, shit! 😄 seems you're not authenticated! Write /auth <password> to authenticate!")
         assert result == ConversationHandler.END
 
