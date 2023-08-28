@@ -1,8 +1,7 @@
-from abc import abstractmethod
-from typing import Protocol
+from abc import abstractmethod, ABC
 
 
-class IMediaServerRepository(Protocol):
+class IMediaServerRepository(ABC):
     @property
     @abstractmethod
     def media_type_name(self) -> str:
@@ -22,7 +21,7 @@ class IMediaServerRepository(Protocol):
         """Returns Library Results"""
 
     @abstractmethod
-    def add_to_library(self, id: int, path: str, qualityProfileId) -> bool:
+    def add_to_library(self, id: int, path: str, quality_profile_id) -> bool:
         """Adds Entry to Library"""
 
     @abstractmethod
