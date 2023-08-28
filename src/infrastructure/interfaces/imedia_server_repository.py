@@ -21,7 +21,7 @@ class IMediaServerRepository(ABC):
         """Returns Library Results"""
 
     @abstractmethod
-    def add_to_library(self, id: int, path: str, qualityProfileId) -> bool:
+    def add_to_library(self, id: int, path: str, quality_profile_id) -> bool:
         """Adds Entry to Library"""
 
     @abstractmethod

@@ -4,7 +4,7 @@ from kink import inject
 
 from src.infrastructure.interfaces.imedia_server_factory import IMediaServerFactory
 from src.infrastructure.media_server import MediaServer
-from src.infrastructure.interfaces.imedia_server import IMediaServerRepository
+from src.infrastructure.interfaces.imedia_server_repository import IMediaServerRepository
 
 
 @inject

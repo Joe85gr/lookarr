@@ -4,7 +4,7 @@ from kink import inject
 import json
 import requests
 from src.domain.config.app_config import Config
-from src.infrastructure.interfaces.imedia_server import IMediaServerRepository
+from src.infrastructure.interfaces.imedia_server_repository import IMediaServerRepository
 from src.infrastructure.radarr.movie import Movie
 from urllib.parse import quote
 from src.logger import ILogger
@@ -48,14 +48,14 @@ class Radarr(IMediaServerRepository):
         else:
             return []
 
-    def add_to_library(self, id: int, path: str, qualityProfileId) -> bool:
+    def add_to_library(self, id: int, path: str, quality_profile_id) -> bool:
         parameters = {"tmdbId": str(id)}
         req = self._requests.get(
             self._generate_api_query("movie/lookup/tmdb", parameters),
             headers={'X-Api-Key': str(os.environ.get("RADARR_API_KEY"))}
         )
         parsed_json = json.loads(req.text)
-        data = json.dumps(self._build_data(parsed_json, path, qualityProfileId))
+        data = json.dumps(self._build_data(parsed_json, path, quality_profile_id))
         add = self._requests.post(self._generate_api_query("movie"), data=data,
                                   headers={'Content-Type': 'application/json',
                                      'X-Api-Key': str(os.environ.get("RADARR_API_KEY"))})

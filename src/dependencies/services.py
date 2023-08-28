@@ -9,7 +9,7 @@ from src.domain.handlers.interfaces.ihelp_handler import IHelpHandler
 from src.infrastructure.interfaces.IDatabase import IDatabase
 from src.infrastructure.db.sqlite import Database
 from src.infrastructure.interfaces.imedia_server_factory import IMediaServerFactory
-from src.infrastructure.interfaces.imedia_server import IMediaServerRepository
+from src.infrastructure.interfaces.imedia_server_repository import IMediaServerRepository
 from src.infrastructure.media_server_factory import MediaServerFactory
 from src.domain.auth.authentication import Auth
 from src.domain.auth.interfaces.iauthentication import IAuth
