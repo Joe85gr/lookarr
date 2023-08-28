@@ -13,7 +13,7 @@ from src.logger import ILogger
 @inject
 class Radarr(IMediaServerRepository):
     def __init__(self, logger: ILogger, config: Config, client: requests):
-        self.config = config.radarr
+        self._config = config.radarr
         self._logger = logger
         self._requests = client
 
@@ -48,18 +48,6 @@ class Radarr(IMediaServerRepository):
         else:
             return []
 
-    def _generate_api_query(self, endpoint: str, parameters: dict = None):
-        url = (
-                f"http://{self.config.url}:{self.config.port}/" +
-                "api/v3/" + str(endpoint)
-        )
-
-        if parameters:
-            url += "?"
-            for key, value in parameters.items():
-                url += "&" + key + "=" + value
-        return url.replace(" ", "%20").replace("?&", "?")
-
     def add_to_library(self, id: int, path: str, qualityProfileId) -> bool:
         parameters = {"tmdbId": str(id)}
         req = self._requests.get(
@@ -67,7 +55,7 @@ class Radarr(IMediaServerRepository):
             headers={'X-Api-Key': str(os.environ.get("RADARR_API_KEY"))}
         )
         parsed_json = json.loads(req.text)
-        data = json.dumps(self.build_data(parsed_json, path, qualityProfileId))
+        data = json.dumps(self._build_data(parsed_json, path, qualityProfileId))
         add = self._requests.post(self._generate_api_query("movie"), data=data,
                                   headers={'Content-Type': 'application/json',
                                      'X-Api-Key': str(os.environ.get("RADARR_API_KEY"))})
@@ -104,16 +92,28 @@ class Radarr(IMediaServerRepository):
         parsed_json = json.loads(req.text)
         return parsed_json
 
+    def _generate_api_query(self, endpoint: str, parameters: dict = None):
+        url = (
+                f"http://{self._config.url}:{self._config.port}/" +
+                "api/v3/" + str(endpoint)
+        )
+
+        if parameters:
+            url += "?"
+            for key, value in parameters.items():
+                url += "&" + key + "=" + value
+        return url.replace(" ", "%20").replace("?&", "?")
+
     @staticmethod
-    def build_data(json_data, path, quality_profile_id):
+    def _build_data(json_data, path, quality_profile_id):
         built_data = {
             "qualityProfileId": int(quality_profile_id),
             "rootFolderPath": path,
             "addOptions": {"searchForMovie": True},
         }
 
-        addMovieNeededFields = ["tmdbId", "year", "title", "titleSlug", "images"]
+        required_fields = ["tmdbId", "year", "title", "titleSlug", "images"]
 
-        for key in addMovieNeededFields:
+        for key in required_fields:
             built_data[key] = json_data[key]
         return built_data
