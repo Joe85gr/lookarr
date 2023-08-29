@@ -4,11 +4,11 @@ from tests.mockers.mock_decorators import mock_check_user_is_authenticated, mock
 mock_check_user_is_authenticated()
 mock_check_check_conversation()
 
-from src.domain.handlers.conversation_handler import ConversationHandler
+from src.domain.handlers.media_handler import MediaHandler
 
 
 class Test_SearchHandler:
-    @patch.object(ConversationHandler, 'show_medias', MagicMock())
+    @patch.object(MediaHandler, 'show_medias', MagicMock())
     def test_option_change(self):
         # Arrange
         update = Mock()
@@ -24,7 +24,7 @@ class Test_SearchHandler:
             context.user_data = {"position": 2}
             update.callback_query.data = test_case["query"]
 
-            sut = ConversationHandler(Mock())
+            sut = MediaHandler(Mock())
 
             # Act
             sut.change_option(update, context)

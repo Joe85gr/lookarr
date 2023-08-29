@@ -4,7 +4,7 @@ from kink import inject
 
 from src.domain.checkers.authentication_checker import check_user_is_authenticated
 from src.domain.checkers.conversation_checker import check_conversation
-from src.domain.handlers.interfaces.iconversation_handler import IConversationHandler
+from src.domain.handlers.interfaces.iconversation_handler import IMediaHandler
 from src.domain.handlers.interfaces.iseries_handler import ISeriesHandler
 from src.domain.handlers.messages_handler import MessagesHandler
 from src.interface.keyboard import Keyboard
@@ -13,7 +13,7 @@ from src.logger import ILogger
 
 @inject
 class SeriesHandler(ISeriesHandler):
-    def __init__(self, logger: ILogger, conversation_handler: IConversationHandler):
+    def __init__(self, logger: ILogger, conversation_handler: IMediaHandler):
         self._logger = logger,
         self._conversation_handler = conversation_handler
 

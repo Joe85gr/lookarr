@@ -7,7 +7,7 @@ from src.domain.checkers.authentication_checker import check_user_is_authenticat
 from src.domain.checkers.conversation_checker import check_conversation
 from src.domain.checkers.search_checker import check_search_is_valid
 from src.domain.config.app_config import Config
-from src.domain.handlers.interfaces.iconversation_handler import IConversationHandler
+from src.domain.handlers.interfaces.iconversation_handler import IMediaHandler
 from src.domain.handlers.messages_handler import MessagesHandler
 from src.domain.handlers.stop_handler import stop_handler
 from src.infrastructure.folder import Folder
@@ -18,7 +18,7 @@ from src.logger import ILogger
 
 
 @inject
-class ConversationHandler(IConversationHandler):
+class MediaHandler(IMediaHandler):
     def __init__(
             self,
             media_server_factory: IMediaServerFactory,
@@ -62,7 +62,7 @@ class ConversationHandler(IConversationHandler):
                 "I couldn't retrieve the available folders 😔 not much I can do really.."
             )
             stop_handler.clear_user_data(update, context)
-            return ConversationHandler.END
+            return MediaHandler.END
 
         results = [from_dict(data_class=Folder, data=folder) for folder in folders]
 
@@ -106,7 +106,7 @@ class ConversationHandler(IConversationHandler):
         MessagesHandler.update_message(context, update, message)
 
         stop_handler.clear_user_data(update, context)
-        return ConversationHandler.END
+        return MediaHandler.END
 
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
@@ -138,7 +138,7 @@ class ConversationHandler(IConversationHandler):
         MessagesHandler.update_message(context, update, message)
 
         stop_handler.clear_user_data(update, context, False)
-        return ConversationHandler.END
+        return MediaHandler.END
 
     @check_user_is_authenticated
     @check_conversation(["reply"])
@@ -156,7 +156,7 @@ class ConversationHandler(IConversationHandler):
         if not results:
             query.edit_message_text(text=f"Sorry, I couldn't fine any result for '{context.user_data['reply']}' 😔")
             stop_handler.clear_user_data(update, context, False)
-            return ConversationHandler.END
+            return MediaHandler.END
 
         context.user_data["position"] = 0
         context.user_data["results"] = results
