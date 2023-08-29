@@ -4,7 +4,7 @@ from telegram import Update
 from telegram.ext import CallbackContext
 
 
-class ISearchHandler(ABC):
+class IConversationHandler(ABC):
     @abstractmethod
     def search(self, update: Update, context: CallbackContext) -> None | int:
         """Search for a movie or tv show"""

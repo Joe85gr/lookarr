@@ -18,9 +18,9 @@ class Keyboard:
         return keyboard
 
     @staticmethod
-    def quality_profiles(profiles:  list[QualityProfile]):
+    def quality_profiles(profiles:  list[QualityProfile], media_type: str):
 
-        return [[Buttons.quality_profile_button(profile)] for profile in profiles] \
+        return [[Buttons.quality_profile_button(profile, media_type)] for profile in profiles] \
              + [[Buttons.stop_button()]]
 
     @staticmethod
@@ -29,6 +29,15 @@ class Keyboard:
             [Buttons.yes_button()],
             [Buttons.no_button()]
         ]
+
+        return keyboard
+
+    @staticmethod
+    def seasons(seasons: list):
+        keyboard = [[Buttons.season_button(season)] for season in seasons if season != 0] \
+             + [[Buttons.stop_button()]]
+
+        keyboard.insert(0, [Buttons.season_button("All")])
 
         return keyboard
 

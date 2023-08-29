@@ -27,17 +27,10 @@ class Buttons:
         )
 
     @staticmethod
-    def new_search_button():
-        return InlineKeyboardButton(
-            '\U0001F50D ' + "NewSearch",
-            callback_data="New"
-        )
-
-    @staticmethod
     def add_button():
         return InlineKeyboardButton(
             "Add",
-            callback_data="Add"
+            callback_data="GetFolders"
         )
 
     @staticmethod
@@ -58,21 +51,21 @@ class Buttons:
     def path_button(folder: Folder):
         return InlineKeyboardButton(
             f"Path: {folder.path}, Free: {folder.availableSpace}",
-            callback_data=f"Path: {folder.path}"
+            callback_data=f"GetQualityProfiles: {folder.path}"
         )
 
     @staticmethod
-    def quality_profile_button(quality_profile: QualityProfile):
+    def quality_profile_button(quality_profile: QualityProfile, media_type: str):
         return InlineKeyboardButton(
             f"Quality: {quality_profile.name}",
-            callback_data=f"Quality: {quality_profile.id}"
+            callback_data=f"{media_type}Quality: {quality_profile.id}"
         )
 
     @staticmethod
     def season_button(season):
         return InlineKeyboardButton(
-            f"Season {season}",
-            callback_data=f"Season: {season}"
+            f"Season {season}" if season != "All" else season,
+            callback_data=f"SetSeason: {season}"
         )
 
     @staticmethod

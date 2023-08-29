@@ -6,6 +6,10 @@ from src.domain.config.app_config import Config
 from src.domain.config.config_loader import ConfigLoader
 from src.domain.handlers.help_handler import HelpHandler
 from src.domain.handlers.interfaces.ihelp_handler import IHelpHandler
+from src.domain.handlers.interfaces.imovie_handler import IMovieHandler
+from src.domain.handlers.movie_handler import MovieHandler
+from src.domain.handlers.series_handler import SeriesHandler
+from src.domain.handlers.interfaces.iseries_handler import ISeriesHandler
 from src.infrastructure.interfaces.IDatabase import IDatabase
 from src.infrastructure.db.sqlite import Database
 from src.infrastructure.interfaces.imedia_server_factory import IMediaServerFactory
@@ -16,10 +20,11 @@ from src.domain.auth.interfaces.iauthentication import IAuth
 from src.infrastructure.radarr.radarr import Radarr
 from src.domain.handlers.authentication_handler import AuthHandler
 from src.domain.handlers.interfaces.iauthentication_handler import IAuthHandler
-from src.domain.handlers.conversation_handler import SearchHandler
-from src.domain.handlers.interfaces.iconversation_handler import ISearchHandler
+from src.domain.handlers.conversation_handler import ConversationHandler
+from src.domain.handlers.interfaces.iconversation_handler import IConversationHandler
 from src.domain.handlers.interfaces.istop_handler import IStopHandler
 from src.domain.handlers.stop_handler import StopHandler
+from src.infrastructure.sonarr.sonarr import Sonarr
 
 
 def configure_services() -> None:
@@ -29,11 +34,14 @@ def configure_services() -> None:
     di["client"] = requests
 
     di[List[IMediaServerRepository]] = [
-        Radarr()
+        Radarr(),
+        Sonarr()
     ]
 
     di[IMediaServerFactory] = MediaServerFactory()
     di[IAuthHandler] = AuthHandler()
-    di[ISearchHandler] = SearchHandler()
+    di[IConversationHandler] = ConversationHandler()
+    di[ISeriesHandler] = SeriesHandler()
+    di[IMovieHandler] = MovieHandler()
     di[IStopHandler] = StopHandler()
     di[IHelpHandler] = HelpHandler()

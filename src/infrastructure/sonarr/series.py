@@ -2,13 +2,15 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
+from src.constants import DEFAULT_IMAGE
+
 
 @dataclass
 class Series:
     title: str
     added: str
     year: Optional[int]
-    tmdbId: Optional[int]
+    tvdbId: Optional[int]
     certification: Optional[str]
     genres: Optional[list[str]]
     overview: Optional[str]
@@ -17,11 +19,16 @@ class Series:
     status: Optional[str]
     youtubeTrailerUrl: str = None
     hasFile: bool = False
-    remotePoster: Optional[str] = "https://artworks.thetvdb.com/banners/images/missing/movie.jpg"
+    remotePoster: Optional[str] = DEFAULT_IMAGE
+    defaultPoster: str = DEFAULT_IMAGE
+
+    @property
+    def id(self) -> int:
+        return self.tvdbId
 
     @property
     def is_in_library(self):
-        return datetime.strptime(self.added, '%Y-%m-%dT%H:%M:%SZ').year != 1
+        return self.added != '0001-01-01T00:00:00Z'
 
     def __post_init__(self):
         if self.youTubeTrailerId:

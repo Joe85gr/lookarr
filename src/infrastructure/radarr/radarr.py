@@ -48,21 +48,27 @@ class Radarr(IMediaServerRepository):
         else:
             return []
 
-    def add_to_library(self, id: int, path: str, quality_profile_id) -> bool:
-        parameters = {"tmdbId": str(id)}
+    def add_to_library(self, user_data: dict) -> bool:
+        parameters = {"tmdbId": str(user_data['id'])}
+
         req = self._requests.get(
             self._generate_api_query("movie/lookup/tmdb", parameters),
             headers={'X-Api-Key': str(os.environ.get("RADARR_API_KEY"))}
         )
+
         parsed_json = json.loads(req.text)
-        data = json.dumps(self._build_data(parsed_json, path, quality_profile_id))
+
+        data = json.dumps(self._build_data(parsed_json, user_data['path'], user_data['quality_profile']))
+
         add = self._requests.post(self._generate_api_query("movie"), data=data,
                                   headers={'Content-Type': 'application/json',
                                      'X-Api-Key': str(os.environ.get("RADARR_API_KEY"))})
+
         if add.status_code == 201:
             return True
         else:
-            self._logger.error(f"Radarr error while adding {id} status code: {add.status_code}, error: {add.text}")
+            self._logger.error(f"Radarr error while adding {user_data['id']} "
+                               f"status code: {add.status_code}, error: {add.text}")
             return False
 
     def remove_from_library(self, id: int) -> bool:

@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 from kink import di
 from requests import Response
 
-from src.domain.config.radarr_config import RadarrConfig
+from src.domain.config.media_server_config import MediaServerConfig
 from tests.data.radarr import VALID_RESPONSE
 
 mock_response = Response()
@@ -30,7 +30,7 @@ class Test_Radarr:
         mock_response.status_code = 200
         mock_response.json = MagicMock(return_value=VALID_RESPONSE)
 
-        config = RadarrConfig(url=self._url, port=self._port, enabled=True)
+        config = MediaServerConfig(url=self._url, port=self._port, enabled=True)
         sut = Radarr(config)
         title = "Harry Potter"
 
