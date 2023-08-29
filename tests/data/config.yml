@@ -9,6 +9,6 @@ radarr:
   port: 7878
 
 sonarr:
-  enabled: False
+  enabled: True
   url: 10.66.66.10
   port: 8989

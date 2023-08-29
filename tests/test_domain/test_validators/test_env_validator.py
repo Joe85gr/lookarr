@@ -16,7 +16,7 @@ class Test_EnvValidator:
 
         # Act
         result = EnvValidator({})
-        result.verify_required_env_variables_exist(radarr_is_enabled=False)
+        result.verify_required_env_variables_exist(radarr_is_enabled=False, sonarr_is_enabled=False)
 
         # Assess
         assert result.is_valid is True
@@ -26,10 +26,11 @@ class Test_EnvValidator:
         os.environ["TELEGRAM_BOT_KEY"] = "some-bot-key"
         os.environ["LOOKARR_AUTH_PASSWORD"] = "some-addarr-password"
         os.environ["RADARR_API_KEY"] = "some-radarr-key"
+        os.environ["SONARR_API_KEY"] = "some-sonarr-key"
 
         # Act
         result = EnvValidator({})
-        result.verify_required_env_variables_exist(radarr_is_enabled=True)
+        result.verify_required_env_variables_exist(radarr_is_enabled=True, sonarr_is_enabled=True)
 
         # Assess
         assert result.is_valid is True
@@ -41,7 +42,7 @@ class Test_EnvValidator:
 
         # Act
         result = EnvValidator({})
-        result.verify_required_env_variables_exist(radarr_is_enabled=True)
+        result.verify_required_env_variables_exist(radarr_is_enabled=True, sonarr_is_enabled=False)
 
         # Assess
         assert result.is_valid is False
@@ -51,7 +52,7 @@ class Test_EnvValidator:
 
         # Act
         result = EnvValidator({})
-        result.verify_required_env_variables_exist(radarr_is_enabled=False)
+        result.verify_required_env_variables_exist(radarr_is_enabled=False, sonarr_is_enabled=False)
 
         # Assess
         assert result.is_valid is False
