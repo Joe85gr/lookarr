@@ -7,3 +7,8 @@ radarr:
   enabled: True
   url: 10.66.66.10
   port: 7878
+
+sonarr:
+  enabled: True
+  url: 10.66.66.10
+  port: 8989

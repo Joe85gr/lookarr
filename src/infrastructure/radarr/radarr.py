@@ -1,10 +1,11 @@
 import os
-from dacite import from_dict
 from kink import inject
 import json
 import requests
 from src.domain.config.app_config import Config
+from src.infrastructure.api_query import ApiConfig
 from src.infrastructure.interfaces.imedia_server_repository import IMediaServerRepository
+from src.infrastructure.media_server_repository import IMediaServerRepositoryBase
 from src.infrastructure.radarr.movie import Movie
 from urllib.parse import quote
 from src.logger import ILogger
@@ -12,10 +13,16 @@ from src.logger import ILogger
 
 @inject
 class Radarr(IMediaServerRepository):
-    def __init__(self, logger: ILogger, config: Config, client: requests):
+    def __init__(self, logger: ILogger, config: Config, client: requests, media_server: IMediaServerRepositoryBase):
         self._config = config.radarr
         self._logger = logger
         self._requests = client
+        self._media_server = media_server
+        self._api_key_identifier = "RADARR_API_KEY"
+
+    @property
+    def _api_query(self):
+        return ApiConfig(url=self._config.url, port=self._config.port)
 
     @property
     def media_type_name(self) -> str:
@@ -26,83 +33,43 @@ class Radarr(IMediaServerRepository):
         return Movie
 
     def search(self, title: str = None, tmdbid: int = None) -> dict:
-
         parameters = {"term": f"tmdb:{tmdbid}" if tmdbid else quote(title)}
         url = self._generate_api_query("movie/lookup", parameters)
-        response = self._requests.get(url, headers={'X-Api-Key': str(os.environ.get("RADARR_API_KEY"))})
 
-        if response.status_code == 200:
-            return response.json()
-        else:
-            self._logger.error(f"Radarr error while searching {title} status code: {response.status_code}")
-            return {}
+        return self._media_server.search(url, self._api_key_identifier)
 
     def get_my_library(self) -> list[Movie]:
         url = self._generate_api_query("movie/lookup")
-        response = self._requests.get(url, headers={'X-Api-Key': str(os.environ.get("RADARR_API_KEY"))})
+        return self._media_server.get_my_library(url, self._api_key_identifier, Movie)
 
-        if response.status_code == 200:
-            parsed_json = json.loads(response.text)
-            movies = [from_dict(data_class=Movie, data=entry) for entry in parsed_json]
-            return movies
-        else:
-            return []
+    def add_to_library(self, user_data: dict) -> bool:
+        parameters = {"tmdbId": str(user_data['id'])}
 
-    def add_to_library(self, id: int, path: str, quality_profile_id) -> bool:
-        parameters = {"tmdbId": str(id)}
         req = self._requests.get(
             self._generate_api_query("movie/lookup/tmdb", parameters),
             headers={'X-Api-Key': str(os.environ.get("RADARR_API_KEY"))}
         )
-        parsed_json = json.loads(req.text)
-        data = json.dumps(self._build_data(parsed_json, path, quality_profile_id))
-        add = self._requests.post(self._generate_api_query("movie"), data=data,
-                                  headers={'Content-Type': 'application/json',
-                                     'X-Api-Key': str(os.environ.get("RADARR_API_KEY"))})
-        if add.status_code == 201:
-            return True
-        else:
-            self._logger.error(f"Radarr error while adding {id} status code: {add.status_code}, error: {add.text}")
-            return False
 
-    def remove_from_library(self, id: int) -> bool:
-        query = f'{self._generate_api_query(f"movie")}/{id}'
-        req = self._requests.delete(
-            query,
-            headers={'X-Api-Key': str(os.environ.get("RADARR_API_KEY"))})
-        if req.status_code == 200:
-            return True
-        else:
-            self._logger.error(f"Radarr error while removing {id} status code: {req.status_code}, error: {req.text}")
-            return False
+        parsed_json = json.loads(req.text)
+
+        data = self._build_data(parsed_json, user_data['path'], user_data['quality_profile'])
+
+        return self._media_server.add_to_library(data, self._generate_api_query("movie"), self._api_key_identifier,)
+
+    def remove_from_library(self, media_id: int) -> bool:
+        query = f'{self._generate_api_query(f"movie")}/{media_id}'
+        return self._media_server.remove_from_library(query, self._api_key_identifier)
 
     def get_root_folders(self):
-        req = self._requests.get(self._generate_api_query("Rootfolder"),
-                                 headers={'X-Api-Key': str(os.environ.get("RADARR_API_KEY"))})
-
-        if req.status_code == 200:
-            parsed_json = json.loads(req.text)
-            return parsed_json
-
-        return {}
+        query = self._generate_api_query("Rootfolder")
+        return self._media_server.get_root_folders(query, self._api_key_identifier)
 
     def get_quality_profiles(self):
-        req = self._requests.get(self._generate_api_query("qualityProfile"),
-                                 headers={'X-Api-Key': str(os.environ.get("RADARR_API_KEY"))})
-        parsed_json = json.loads(req.text)
-        return parsed_json
+        query = self._generate_api_query("qualityProfile")
+        return self._media_server.get_quality_profiles(query, self._api_key_identifier)
 
     def _generate_api_query(self, endpoint: str, parameters: dict = None):
-        url = (
-                f"http://{self._config.url}:{self._config.port}/" +
-                "api/v3/" + str(endpoint)
-        )
-
-        if parameters:
-            url += "?"
-            for key, value in parameters.items():
-                url += "&" + key + "=" + value
-        return url.replace(" ", "%20").replace("?&", "?")
+        return self._media_server.generate_api_query(self._api_query, endpoint, parameters)
 
     @staticmethod
     def _build_data(json_data, path, quality_profile_id):

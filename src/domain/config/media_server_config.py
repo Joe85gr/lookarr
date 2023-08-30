@@ -3,7 +3,7 @@ from typing import Optional
 
 
 @dataclass
-class RadarrConfig:
+class MediaServerConfig:
     url: Optional[str]
     port: Optional[str]
     enabled: Optional[bool] = False

@@ -4,10 +4,10 @@ from telegram.ext import CallbackContext, ConversationHandler
 from kink import inject
 
 from src.domain.checkers.authentication_checker import check_user_is_authenticated
-from src.domain.checkers.conversation_checker import check_conversation, answer_query
+from src.domain.checkers.conversation_checker import check_conversation
 from src.domain.checkers.search_checker import check_search_is_valid
 from src.domain.config.app_config import Config
-from src.domain.handlers.interfaces.iconversation_handler import ISearchHandler
+from src.domain.handlers.interfaces.iconversation_handler import IMediaHandler
 from src.domain.handlers.messages_handler import MessagesHandler
 from src.domain.handlers.stop_handler import stop_handler
 from src.infrastructure.folder import Folder
@@ -18,7 +18,7 @@ from src.logger import ILogger
 
 
 @inject
-class SearchHandler(ISearchHandler):
+class MediaHandler(IMediaHandler):
     def __init__(
             self,
             media_server_factory: IMediaServerFactory,
@@ -78,33 +78,27 @@ class SearchHandler(ISearchHandler):
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
 
         if not context.user_data.get("path"):
-            context.user_data["path"] = query.data.removeprefix("Path: ")
+            context.user_data["path"] = query.data.removeprefix("GetQualityProfiles: ")
 
         qualityProfiles = media_server.media_server.get_quality_profiles()
 
         results = [from_dict(data_class=QualityProfile, data=entry) for entry in qualityProfiles]
 
-        keyboard = Keyboard.quality_profiles(results)
+        keyboard = Keyboard.quality_profiles(results, context.user_data["type"])
 
         MessagesHandler.update_message(context, update, "Select Quality Profile:", keyboard)
 
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
     def add_to_library(self, update: Update, context: CallbackContext):
-        query = update.callback_query
-
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
 
-        if not context.user_data.get("quality_profile"):
-            context.user_data["quality_profile"] = query.data.removeprefix("Quality: ")
-
-        contentAdded = media_server.media_server.add_to_library(context.user_data['id'], context.user_data['path'],
-                                                                context.user_data['quality_profile'])
+        content_added = media_server.media_server.add_to_library(context.user_data)
 
         position = context.user_data["position"]
         title_added = context.user_data['results'][position]['title']
 
-        if contentAdded:
+        if content_added:
             message = f"{title_added} added to your Library! 🥳"
         else:
             message = f"Unfortunately I was unable to add '{title_added}' to your library 😔"
@@ -147,14 +141,11 @@ class SearchHandler(ISearchHandler):
         return ConversationHandler.END
 
     @check_user_is_authenticated
-    @answer_query()
+    @check_conversation(["reply"])
     def search_media(self, update: Update, context: CallbackContext) -> None | int:
         query = update.callback_query
 
         context.user_data["type"] = update.callback_query.data
-
-        if stop_handler.lost_track_of_conversation(update, context, ["type", "reply"]):
-            return ConversationHandler.END
 
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
 
@@ -183,7 +174,7 @@ class SearchHandler(ISearchHandler):
 
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
 
-        results = [from_dict(data_class=media_server.data_type, data=entry) for entry in context.user_data['results']]
+        results = [from_dict(data_class=media_server.media_server.media_type, data=entry) for entry in context.user_data['results']]
 
         current = results[position]
         context.user_data["id"] = current.id
