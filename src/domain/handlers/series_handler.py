@@ -66,13 +66,3 @@ class SeriesHandler(ISeriesHandler):
                 if season["seasonNumber"] == int(selected_season):
                     season["selected"] = not season["selected"]
                     break
-
-    @check_user_is_authenticated
-    @check_conversation(["update_msg", "type"])
-    def set_season(self, update: Update, context: CallbackContext):
-        query = update.callback_query
-
-        context.user_data["season"] = query.data.removeprefix("SetSeason: ")
-
-        self._conversation_handler.add_to_library(update, context)
-

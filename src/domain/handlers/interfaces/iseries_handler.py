@@ -12,7 +12,3 @@ class ISeriesHandler(ABC):
     @abstractmethod
     def select_season(self, update: Update, context: CallbackContext):
         """Select season"""
-
-    @abstractmethod
-    def set_season(self, update: Update, context: CallbackContext):
-        """Set season"""
