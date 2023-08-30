@@ -33,6 +33,7 @@ def configure_services() -> None:
     di[IDatabase] = Database()
     di[IAuth] = Auth()
     di["client"] = requests
+
     di[IMediaServerRepositoryBase] = MediaServer()
 
     di[List[IMediaServerRepository]] = [

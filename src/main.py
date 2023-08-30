@@ -46,14 +46,15 @@ def main(
 
     updater.dispatcher.add_handler(CommandHandler(config.lookarr.search_all_command, media_handler.search))
     updater.dispatcher.add_handler(CallbackQueryHandler(movie_handler.add_to_library, pattern="MovieQuality"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(series_handler.select_season, pattern="SeriesQuality"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(movie_handler.add_to_library, pattern="AddSeries"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(series_handler.set_quality, pattern="SeriesQuality"))
     updater.dispatcher.add_handler(CallbackQueryHandler(media_handler.search_media, pattern="Series|Movie"))
     updater.dispatcher.add_handler(CallbackQueryHandler(media_handler.change_option,
                                                         pattern="Next|Previous"))
     updater.dispatcher.add_handler(CallbackQueryHandler(media_handler.get_folders, pattern="GetFolders"))
     updater.dispatcher.add_handler(CallbackQueryHandler(media_handler.get_quality_profiles,
                                                         pattern="GetQualityProfiles"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(series_handler.set_season, pattern="SetSeason"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(series_handler.select_season, pattern="SelectSeason"))
     updater.dispatcher.add_handler(CallbackQueryHandler(media_handler.confirm_delete,
                                                         pattern="ConfirmDelete"))
     updater.dispatcher.add_handler(CallbackQueryHandler(media_handler.delete, pattern="Delete"))

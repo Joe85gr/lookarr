@@ -54,11 +54,9 @@ class Sonarr(IMediaServerRepository):
 
         seasons = []
 
-        if user_data['season'] == "All":
-            for season_number in user_data['season_numbers']:
-                seasons.append({"seasonNumber": season_number, "monitored": True})
-        else:
-            seasons.append({"seasonNumber": user_data['season'], "monitored": True})
+        for season in user_data['seasons']:
+            if season["selected"]:
+                seasons.append({"seasonNumber": season["seasonNumber"], "monitored": True})
 
         parameters = {
             "term": f"tvdb:{user_data['id']}",

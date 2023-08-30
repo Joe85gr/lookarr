@@ -34,10 +34,23 @@ class Keyboard:
 
     @staticmethod
     def seasons(seasons: list):
-        keyboard = [[Buttons.season_button(season)] for season in seasons if season != 0] \
-             + [[Buttons.stop_button()]]
+        keyboard = []
+        at_least_one_selected = False
+        all_selected = True
+        for value in seasons:
+            if value["selected"]:
+                at_least_one_selected = True
+            else:
+                all_selected = False
+            keyboard.append([Buttons.season_button(str(value["seasonNumber"]), value["selected"])])
 
-        keyboard.insert(0, [Buttons.season_button("All")])
+        if at_least_one_selected:
+            keyboard.append([Buttons.continue_button("Continue", "AddSeries")])
+
+        keyboard.append([Buttons.stop_button()])
+
+        first_button_text = "Unselect" if all_selected else "All"
+        keyboard.insert(0, [Buttons.season_button(first_button_text)])
 
         return keyboard
 

@@ -19,21 +19,53 @@ class SeriesHandler(ISeriesHandler):
 
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
-    def select_season(self, update: Update, context: CallbackContext):
+    def set_quality(self, update: Update, context: CallbackContext):
         query = update.callback_query
 
         if not context.user_data.get("quality_profile"):
             context.user_data["quality_profile"] = query.data.removeprefix("SeriesQuality: ")
 
+        self.select_season(update, context)
+
+    @check_user_is_authenticated
+    @check_conversation(["update_msg", "type"])
+    def select_season(self, update: Update, context: CallbackContext):
+        query = update.callback_query
+
         position = context.user_data["position"]
 
-        seasons = context.user_data['results'][position]['seasons']
-        season_numbers = [int(season["seasonNumber"]) for season in seasons if season["seasonNumber"] != 0]
-        context.user_data["season_numbers"] = season_numbers
+        if not "seasons" in context.user_data:
+            self._set_seasons(context, position)
+        else:
+            self._update_selected_seasons(query, context)
 
-        keyboard = Keyboard.seasons(season_numbers)
+        seasons = context.user_data["seasons"]
+
+        keyboard = Keyboard.seasons(seasons)
 
         MessagesHandler.update_message(context, update, "Select Season:", keyboard)
+
+    @staticmethod
+    def _set_seasons(context: CallbackContext, position: int):
+        seasons = context.user_data['results'][position]['seasons']
+        seasons = [season for season in seasons if season["seasonNumber"] != 0]
+        for season in seasons:
+            season["selected"] = False
+
+        context.user_data["seasons"] = seasons
+
+    @staticmethod
+    def _update_selected_seasons(query, context: CallbackContext):
+        selected_season = query.data.removeprefix("SelectSeason: ")
+        if selected_season in ["All", "Unselect"]:
+            selected = True if selected_season == "All" else False
+            for season in context.user_data["seasons"]:
+                season["selected"] = selected
+        else:
+            for season in context.user_data["seasons"]:
+                if season["seasonNumber"] == int(selected_season):
+                    season["selected"] = not season["selected"]
+                    break
 
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
@@ -43,3 +75,4 @@ class SeriesHandler(ISeriesHandler):
         context.user_data["season"] = query.data.removeprefix("SetSeason: ")
 
         self._conversation_handler.add_to_library(update, context)
+

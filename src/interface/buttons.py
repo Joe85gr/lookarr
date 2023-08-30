@@ -62,11 +62,24 @@ class Buttons:
         )
 
     @staticmethod
-    def season_button(season):
+    def season_button(season, selected=None):
+        if selected:
+            emoji = " 👈"
+        else:
+            emoji = ""
+
         return InlineKeyboardButton(
-            f"Season {season}" if season != "All" else season,
-            callback_data=f"SetSeason: {season}"
+            f"Season {season}{emoji}" if season.isnumeric() else season,
+            callback_data=f"SelectSeason: {season}",
         )
+
+    @staticmethod
+    def continue_button(text: str, callback_data: str):
+        return InlineKeyboardButton(
+            text,
+            callback_data=callback_data
+        )
+
 
     @staticmethod
     def delete_button(delete_text: str = "Delete"):
