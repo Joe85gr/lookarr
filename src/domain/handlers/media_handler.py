@@ -62,7 +62,7 @@ class MediaHandler(IMediaHandler):
                 "I couldn't retrieve the available folders 😔 not much I can do really.."
             )
             stop_handler.clear_user_data(update, context)
-            return MediaHandler.END
+            return ConversationHandler.END
 
         results = [from_dict(data_class=Folder, data=folder) for folder in folders]
 
@@ -106,7 +106,7 @@ class MediaHandler(IMediaHandler):
         MessagesHandler.update_message(context, update, message)
 
         stop_handler.clear_user_data(update, context)
-        return MediaHandler.END
+        return ConversationHandler.END
 
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
@@ -138,7 +138,7 @@ class MediaHandler(IMediaHandler):
         MessagesHandler.update_message(context, update, message)
 
         stop_handler.clear_user_data(update, context, False)
-        return MediaHandler.END
+        return ConversationHandler.END
 
     @check_user_is_authenticated
     @check_conversation(["reply"])
@@ -156,7 +156,7 @@ class MediaHandler(IMediaHandler):
         if not results:
             query.edit_message_text(text=f"Sorry, I couldn't fine any result for '{context.user_data['reply']}' 😔")
             stop_handler.clear_user_data(update, context, False)
-            return MediaHandler.END
+            return ConversationHandler.END
 
         context.user_data["position"] = 0
         context.user_data["results"] = results
@@ -174,7 +174,7 @@ class MediaHandler(IMediaHandler):
 
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
 
-        results = [from_dict(data_class=media_server.data_type, data=entry) for entry in context.user_data['results']]
+        results = [from_dict(data_class=media_server.media_server.media_type, data=entry) for entry in context.user_data['results']]
 
         current = results[position]
         context.user_data["id"] = current.id

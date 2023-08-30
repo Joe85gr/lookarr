@@ -17,6 +17,7 @@ from src.infrastructure.interfaces.imedia_server_repository import IMediaServerR
 from src.infrastructure.media_server_factory import MediaServerFactory
 from src.domain.auth.authentication import Auth
 from src.domain.auth.interfaces.iauthentication import IAuth
+from src.infrastructure.media_server_repository import IMediaServerRepositoryBase, MediaServer
 from src.infrastructure.radarr.radarr import Radarr
 from src.domain.handlers.authentication_handler import AuthHandler
 from src.domain.handlers.interfaces.iauthentication_handler import IAuthHandler
@@ -32,6 +33,7 @@ def configure_services() -> None:
     di[IDatabase] = Database()
     di[IAuth] = Auth()
     di["client"] = requests
+    di[IMediaServerRepositoryBase] = MediaServer()
 
     di[List[IMediaServerRepository]] = [
         Radarr(),

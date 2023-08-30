@@ -151,12 +151,12 @@ VALID_RESPONSE = [
     "images": [
       {
         "coverType": "poster",
-        "url": "/MediaCoverProxy/3839e6717635f23f84aa2252e424514b1a9adf4b56d867c4ba35cdc457c9439c/1k6iwC4KaPvTBt1JuaqXy3noZRY.jpg",
+        "query": "/MediaCoverProxy/3839e6717635f23f84aa2252e424514b1a9adf4b56d867c4ba35cdc457c9439c/1k6iwC4KaPvTBt1JuaqXy3noZRY.jpg",
         "remoteUrl": "https://image.tmdb.org/t/p/original/1k6iwC4KaPvTBt1JuaqXy3noZRY.jpg"
       },
       {
         "coverType": "fanart",
-        "url": "/MediaCoverProxy/456370602c8fca01fc8ad12751eec2dcf7e00403a4d167a2325ca5a1a30dcae8/8kQtBcax6zqiwFhDRS2mmPvLf8.jpg",
+        "query": "/MediaCoverProxy/456370602c8fca01fc8ad12751eec2dcf7e00403a4d167a2325ca5a1a30dcae8/8kQtBcax6zqiwFhDRS2mmPvLf8.jpg",
         "remoteUrl": "https://image.tmdb.org/t/p/original/8kQtBcax6zqiwFhDRS2mmPvLf8.jpg"
       }
     ],
