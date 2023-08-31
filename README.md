@@ -11,7 +11,7 @@ Rename config-sample.yml to config.yml and set it before running
 
 ```bash
 docker build -t lookarr .
-docker run -e TELEGRAM_BOT_KEY=YOUR_TELEGRAM_BOT_KEY -e LOOKARR_AUTH_PASSWORD=YOUR_LOOKARR_AUTH_PASSWORD -e RADARR_API_KEY=YOUR_RADARR_API_KEY -e SONARR_API_KEY=YOUR_SONARR_API_KEY --name lookarr -d lookarr
+docker run -e TELEGRAM_BOT_KEY=YOUR_TELEGRAM_BOT_KEY -e LOOKARR_AUTH_PASSWORD=YOUR_LOOKARR_AUTH_PASSWORD -e RADARR_API_KEY=YOUR_RADARR_API_KEY -e SONARR_API_KEY=YOUR_SONARR_API_KEY -v $(pwd)/user_config/:/app/user_config --name lookarr -d lookarr
 ```
 
 - TELEGRAM_BOT_KEY: Your telegram bot key. See [here](https://core.telegram.org/bots/tutorial) how to get yours.
