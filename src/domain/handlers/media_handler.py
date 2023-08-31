@@ -37,6 +37,7 @@ class MediaHandler(IMediaHandler):
             return ConversationHandler.END
         elif self._config.active_media_servers == 1:
             self._set_media_type(self._config.default_media_server, context)
+            self.search_media(update, context)
         else:
             keyboard = Keyboard.search()
             MessagesHandler.new_message(update, "What you're looking for? 🧐:", keyboard)
@@ -163,25 +164,30 @@ class MediaHandler(IMediaHandler):
     @check_conversation(["reply"])
     def search_media(self, update: Update, context: CallbackContext) -> None | int:
         query = update.callback_query
+        text = f"Looking for '{context.user_data['reply']}'..👀"
+        if query:
+            query.edit_message_text(text=text)
+        else:
+            MessagesHandler.new_message(update, text)
 
         if "type" not in context.user_data:
             self._set_media_type(update.callback_query.data, context)
 
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
 
-        query.edit_message_text(text=f"Looking for '{context.user_data['reply']}'..👀")
-
         results = media_server.media_server.search(context.user_data["reply"])
 
         if not results:
-            query.edit_message_text(text=f"Sorry, I couldn't fine any result for '{context.user_data['reply']}' 😔")
+            message = f"Sorry, I couldn't fine any result for '{context.user_data['reply']}' 😔"
+            if query:
+                query.edit_message_text(text=message)
+            else:
+                MessagesHandler.new_message(update, message)
             stop_handler.clear_user_data(update, context, False)
             return ConversationHandler.END
 
         context.user_data["position"] = 0
         context.user_data["results"] = results
-
-        # query.delete_message()
 
         self.show_medias(update, context)
 

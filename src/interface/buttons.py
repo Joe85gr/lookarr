@@ -80,7 +80,6 @@ class Buttons:
             callback_data=callback_data
         )
 
-
     @staticmethod
     def delete_button(delete_text: str = "Delete"):
         return InlineKeyboardButton(
