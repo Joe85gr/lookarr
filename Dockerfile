@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . /app
 
-RUN	pip install --upgrade pip && pip install --no-cache-dir --target=/app/src -r requirements.txt
+RUN pip install --upgrade pip && pip install --no-cache-dir --target=/app/src -r requirements.txt
 
 FROM python:alpine3.18
 ENV PYTHONPATH=/app

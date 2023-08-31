@@ -65,6 +65,6 @@ class SeriesHandler(ISeriesHandler):
                 season["selected"] = selected
         else:
             for season in context.user_data["seasons"]:
-                if season["seasonNumber"] == int(selected_season):
+                if str(season["seasonNumber"]) == selected_season:
                     season["selected"] = not season["selected"]
                     break

@@ -37,6 +37,7 @@ class MessagesHandler:
     @staticmethod
     def new_message(
             update: Update,
+            context: CallbackContext,
             reply: str,
             keyboard: list = None
     ):
@@ -45,18 +46,26 @@ class MessagesHandler:
 
         reply_markup = InlineKeyboardMarkup(keyboard)
 
-        update.message.reply_text(reply, reply_markup=reply_markup)
+        msg = update.message.reply_text(reply, reply_markup=reply_markup)
+        context.user_data["update_msg"] = msg.message_id
 
     @staticmethod
     def update_query_or_send_new(
             update: Update,
+            context: CallbackContext,
             reply: str
     ):
         query = update.callback_query
         if query:
             query.edit_message_text(text=reply)
         else:
-            MessagesHandler.new_message(update, reply)
+            MessagesHandler.new_message(update, context, reply)
+
+    @staticmethod
+    def delete_current(update: Update, context: CallbackContext):
+        if "update_msg" in context.user_data:
+            context.bot.delete_message(chat_id=update.effective_message.chat_id,
+                                       message_id=context.user_data["update_msg"])
 
     @staticmethod
     def delete_current_and_add_new(
@@ -65,8 +74,7 @@ class MessagesHandler:
             reply: str = None,
             keyboard: list = None
     ):
-        context.bot.delete_message(chat_id=update.effective_message.chat_id,
-                                   message_id=context.user_data["update_msg"])
+        MessagesHandler.delete_current(update, context)
 
         if reply:
             if keyboard is None:

@@ -33,14 +33,14 @@ class MediaHandler(IMediaHandler):
     @check_search_is_valid()
     def start_search(self, update: Update, context: CallbackContext):
         if self._config.active_media_servers == 0:
-            MessagesHandler.new_message(update, "Bro, all media servers are disabled in the config.. 🙄")
+            MessagesHandler.new_message(update, context, "Bro, all media servers are disabled in the config.. 🙄")
             return ConversationHandler.END
         elif self._config.active_media_servers == 1:
             self._set_media_type(self._config.default_media_server, context)
             self.search_media(update, context)
         else:
             keyboard = Keyboard.search()
-            MessagesHandler.new_message(update, "What you're looking for? 🧐:", keyboard)
+            MessagesHandler.new_message(update, context, "What you're looking for? 🧐:", keyboard)
 
     @check_user_is_authenticated
     @check_conversation(["update_msg"])
@@ -163,7 +163,7 @@ class MediaHandler(IMediaHandler):
     @check_user_is_authenticated
     @check_conversation(["reply"])
     def search_media(self, update: Update, context: CallbackContext) -> None | int:
-        MessagesHandler.update_query_or_send_new(update, f"Looking for '{context.user_data['reply']}'..👀")
+        MessagesHandler.update_query_or_send_new(update, context, f"Looking for '{context.user_data['reply']}'..👀")
 
         if "type" not in context.user_data:
             self._set_media_type(update.callback_query.data, context)
@@ -173,8 +173,8 @@ class MediaHandler(IMediaHandler):
         results = media_server.media_server.search(context.user_data["reply"])
 
         if not results:
-            MessagesHandler.update_query_or_send_new(update, f"Sorry, I couldn't fine any result for "
-                                                             f"'{context.user_data['reply']}' 😔")
+            MessagesHandler.update_query_or_send_new(update, context, f"Sorry, I couldn't fine any result for "
+                                                                      f"'{context.user_data['reply']}' 😔")
             stop_handler.clear_user_data(update, context, False)
             return ConversationHandler.END
 
@@ -210,9 +210,7 @@ class MediaHandler(IMediaHandler):
             message += f"\n\n{current.overview}"
 
         message = self._ensure_is_within_char_limit(message)
-
-        if "update_msg" in context.user_data:
-            MessagesHandler.delete_current_and_add_new(context, update)
+        MessagesHandler.delete_current(update, context)
 
         MessagesHandler.send_photo(context, update, message, keyboard, current.remotePoster, current.defaultPoster)
 
