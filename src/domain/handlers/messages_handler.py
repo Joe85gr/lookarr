@@ -48,7 +48,18 @@ class MessagesHandler:
         update.message.reply_text(reply, reply_markup=reply_markup)
 
     @staticmethod
-    def update_message(
+    def update_query_or_send_new(
+            update: Update,
+            reply: str
+    ):
+        query = update.callback_query
+        if query:
+            query.edit_message_text(text=reply)
+        else:
+            MessagesHandler.new_message(update, reply)
+
+    @staticmethod
+    def delete_and_add_new_message(
             context: CallbackContext,
             update: Update,
             reply: str = None,

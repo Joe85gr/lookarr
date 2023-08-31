@@ -58,13 +58,13 @@ class MediaHandler(IMediaHandler):
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
     def get_folders(self, update: Update, context: CallbackContext):
-        MessagesHandler.update_message(context, update, ".. 👀")
+        MessagesHandler.delete_and_add_new_message(context, update, ".. 👀")
 
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
         folders = media_server.media_server.get_root_folders()
 
         if not folders:
-            MessagesHandler.update_message(
+            MessagesHandler.delete_and_add_new_message(
                 context,
                 update,
                 "I couldn't retrieve the available folders 😔 not much I can do really.."
@@ -76,12 +76,12 @@ class MediaHandler(IMediaHandler):
 
         keyboard = Keyboard.folders(results)
 
-        MessagesHandler.update_message(context, update, "Select Download Path:", keyboard)
+        MessagesHandler.delete_and_add_new_message(context, update, "Select Download Path:", keyboard)
 
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
     def get_quality_profiles(self, update: Update, context: CallbackContext):
-        MessagesHandler.update_message(context, update, ".. 👀")
+        MessagesHandler.delete_and_add_new_message(context, update, ".. 👀")
 
         query = update.callback_query
 
@@ -96,12 +96,12 @@ class MediaHandler(IMediaHandler):
 
         keyboard = Keyboard.quality_profiles(results, context.user_data["type"])
 
-        MessagesHandler.update_message(context, update, "Select Quality Profile:", keyboard)
+        MessagesHandler.delete_and_add_new_message(context, update, "Select Quality Profile:", keyboard)
 
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
     def add_to_library(self, update: Update, context: CallbackContext):
-        MessagesHandler.update_message(context, update, ".. 👀")
+        MessagesHandler.delete_and_add_new_message(context, update, ".. 👀")
 
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
 
@@ -115,7 +115,7 @@ class MediaHandler(IMediaHandler):
         else:
             message = f"Unfortunately I was unable to add '{title_added}' to your library 😔"
 
-        MessagesHandler.update_message(context, update, message)
+        MessagesHandler.delete_and_add_new_message(context, update, message)
 
         stop_handler.clear_user_data(update, context)
         return ConversationHandler.END
@@ -123,7 +123,7 @@ class MediaHandler(IMediaHandler):
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
     def confirm_delete(self, update: Update, context: CallbackContext):
-        MessagesHandler.update_message(context, update, ".. 👀")
+        MessagesHandler.delete_and_add_new_message(context, update, ".. 👀")
 
         position = context.user_data["position"]
         title_to_remove = context.user_data['results'][position]['title']
@@ -131,12 +131,12 @@ class MediaHandler(IMediaHandler):
 
         keyboard = Keyboard.delete()
 
-        MessagesHandler.update_message(context, update, message, keyboard)
+        MessagesHandler.delete_and_add_new_message(context, update, message, keyboard)
 
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
     def delete(self, update: Update, context: CallbackContext):
-        MessagesHandler.update_message(context, update, ".. 👀")
+        MessagesHandler.delete_and_add_new_message(context, update, ".. 👀")
 
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
 
@@ -151,7 +151,7 @@ class MediaHandler(IMediaHandler):
         else:
             message = f"Unfortunately I was unable to remove '{title_to_remove}' to your library 😔 try again.."
 
-        MessagesHandler.update_message(context, update, message)
+        MessagesHandler.delete_and_add_new_message(context, update, message)
 
         stop_handler.clear_user_data(update, context, False)
         return ConversationHandler.END
@@ -163,12 +163,8 @@ class MediaHandler(IMediaHandler):
     @check_user_is_authenticated
     @check_conversation(["reply"])
     def search_media(self, update: Update, context: CallbackContext) -> None | int:
+        MessagesHandler.update_query_or_send_new(update, f"Looking for '{context.user_data['reply']}'..👀")
         query = update.callback_query
-        text = f"Looking for '{context.user_data['reply']}'..👀"
-        if query:
-            query.edit_message_text(text=text)
-        else:
-            MessagesHandler.new_message(update, text)
 
         if "type" not in context.user_data:
             self._set_media_type(update.callback_query.data, context)
@@ -178,11 +174,8 @@ class MediaHandler(IMediaHandler):
         results = media_server.media_server.search(context.user_data["reply"])
 
         if not results:
-            message = f"Sorry, I couldn't fine any result for '{context.user_data['reply']}' 😔"
-            if query:
-                query.edit_message_text(text=message)
-            else:
-                MessagesHandler.new_message(update, message)
+            MessagesHandler.update_query_or_send_new(update, f"Sorry, I couldn't fine any result for "
+                                                             f"'{context.user_data['reply']}' 😔")
             stop_handler.clear_user_data(update, context, False)
             return ConversationHandler.END
 
@@ -220,6 +213,6 @@ class MediaHandler(IMediaHandler):
             message = message[:900].rsplit(' ', 1)[0] + "[...]"
 
         if "update_msg" in context.user_data:
-            MessagesHandler.update_message(context, update)
+            MessagesHandler.delete_and_add_new_message(context, update)
 
         MessagesHandler.send_photo(context, update, message, keyboard, current.remotePoster, current.defaultPoster)
