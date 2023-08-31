@@ -203,16 +203,21 @@ class MediaHandler(IMediaHandler):
             message += f"\n\n\U00002705 Already in library! 😄"
             if current.hasFile:
                 message += f" Ready to watch! 🥳"
-            else:
+            elif current.hasFile is not None:
                 message += f"\n\n⚠️ It looks like it's still downloading 🙄"
 
         if current.overview:
             message += f"\n\n{current.overview}"
 
-        if len(message) >= 900:
-            message = message[:900].rsplit(' ', 1)[0] + "[...]"
+        message = self._ensure_is_within_char_limit(message)
 
         if "update_msg" in context.user_data:
             MessagesHandler.delete_current_and_add_new(context, update)
 
         MessagesHandler.send_photo(context, update, message, keyboard, current.remotePoster, current.defaultPoster)
+
+    @staticmethod
+    def _ensure_is_within_char_limit(message: str):
+        if len(message) >= 900:
+            message = message[:900].rsplit(' ', 1)[0] + "[...]"
+        return message

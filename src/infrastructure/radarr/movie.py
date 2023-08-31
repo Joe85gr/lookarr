@@ -25,7 +25,7 @@ class Movie:
     genres: Optional[list[str]]
     overview: Optional[str]
     ratings: Optional[Ratings]
-    hasFile: bool = False
+    hasFile: bool = None
     youTubeTrailerId: Optional[str] = None
     remotePoster: Optional[str] = DEFAULT_IMAGE
     defaultPoster: str = DEFAULT_IMAGE
