@@ -11,7 +11,11 @@ Requires env variables:
 - TELEGRAM_BOT_KEY: Your telegram bot key. See [here](https://core.telegram.org/bots/tutorial) how to get yours.
 - LOOKARR_AUTH_PASSWORD: Your lookarr authentication password. Set it to something strong so others can't access your app 😄
 
-Rename config-sample.yml to config.yml before running
+Optional env vars:
+- RADARR_API_KEY: Your radarr api key. 
+- SONARR_API_KEY: Your sonarr api key. 
+- 
+Rename config-sample.yml to config.yml and set it before running
 
 /auth <LOOKARR_AUTH_PASSWORD> is required when calling the bot the first time.
 

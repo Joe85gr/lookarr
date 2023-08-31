@@ -22,7 +22,10 @@ class check_conversation:
 class answer_query:
     def __call__(self, func):
         def wrapper(cls, update: Update, context: CallbackContext) -> object:
-            update.callback_query.answer()
+            try:
+                update.callback_query.answer()
+            except AttributeError:
+                pass
 
             return func(cls, update, context)
 

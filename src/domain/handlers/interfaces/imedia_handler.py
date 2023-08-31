@@ -6,7 +6,7 @@ from telegram.ext import CallbackContext
 
 class IMediaHandler(ABC):
     @abstractmethod
-    def search(self, update: Update, context: CallbackContext) -> None | int:
+    def start_search(self, update: Update, context: CallbackContext) -> None | int:
         """Search for a movie or tv show"""
 
     @abstractmethod

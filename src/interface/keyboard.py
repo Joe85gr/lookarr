@@ -49,16 +49,17 @@ class Keyboard:
 
         keyboard.append([Buttons.stop_button()])
 
-        first_button_text = "Unselect" if all_selected else "All"
-        keyboard.insert(0, [Buttons.season_button(first_button_text)])
+        if len(seasons) > 1:
+            first_button_text = "Unselect" if all_selected else "All"
+            keyboard.insert(0, [Buttons.season_button(first_button_text)])
 
         return keyboard
 
     @staticmethod
-    def medias(is_in_library: bool, has_file: bool, results_count: int, current_position: int) -> list:
+    def medias(is_in_library: bool, has_file: bool | None, results_count: int, current_position: int) -> list:
         if not is_in_library:
             keyboard = [[Buttons.add_button()]]
-        elif has_file:
+        elif has_file is None or has_file:
             keyboard = [[Buttons.delete_button()]]
         else:
             keyboard = [[Buttons.delete_button("Cancel Download")]]

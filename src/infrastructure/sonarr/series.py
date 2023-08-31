@@ -17,7 +17,7 @@ class Series:
     youTubeTrailerId: Optional[str]
     status: Optional[str]
     youtubeTrailerUrl: str = None
-    hasFile: bool = False
+    hasFile: bool = None
     remotePoster: Optional[str] = DEFAULT_IMAGE
     defaultPoster: str = DEFAULT_IMAGE
 

@@ -14,7 +14,6 @@ class Timer:
         @wraps(func)
         def wrap_func(*args: object, **kwargs: object) -> object:
             t1 = time()
-            sleep(1)
             result = func(*args, **kwargs)
             t2 = time()
             self._logger.info(f'{func.__name__!r} executed in {(t2 - t1):.3f}s')

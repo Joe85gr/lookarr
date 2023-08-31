@@ -25,10 +25,6 @@ class Radarr(IMediaServerRepository):
         return ApiConfig(url=self._config.url, port=self._config.port)
 
     @property
-    def media_type_name(self) -> str:
-        return "Movie"
-
-    @property
     def media_type(self):
         return Movie
 

@@ -13,7 +13,7 @@ class MediaServerFactory(IMediaServerFactory):
         self._systems = {}
 
         for media_server in media_servers:
-            self._systems[media_server.media_type_name] = MediaServer(media_server, media_server.media_type)
+            self._systems[type(media_server).__name__] = MediaServer(media_server, media_server.media_type)
 
     def get_media_server(self, library_type: str) -> MediaServer:
         return self._systems[library_type]

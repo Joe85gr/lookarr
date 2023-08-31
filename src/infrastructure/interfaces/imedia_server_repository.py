@@ -4,11 +4,6 @@ from abc import abstractmethod, ABC
 class IMediaServerRepository(ABC):
     @property
     @abstractmethod
-    def media_type_name(self) -> str:
-        """Returns type name of Media Server"""
-
-    @property
-    @abstractmethod
     def media_type(self):
         """Returns type of Media Server"""
 

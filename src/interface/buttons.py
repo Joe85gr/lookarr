@@ -16,14 +16,14 @@ class Buttons:
     def movie_button():
         return InlineKeyboardButton(
             '\U0001F3AC ' + "Movie",
-            callback_data="Movie"
+            callback_data="Radarr"
         )
 
     @staticmethod
     def series_button():
         return InlineKeyboardButton(
             '\U0001F4FA ' + "Series",
-            callback_data="Series"
+            callback_data="Sonarr"
         )
 
     @staticmethod
@@ -79,7 +79,6 @@ class Buttons:
             text,
             callback_data=callback_data
         )
-
 
     @staticmethod
     def delete_button(delete_text: str = "Delete"):
