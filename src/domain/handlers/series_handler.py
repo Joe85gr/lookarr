@@ -30,7 +30,7 @@ class SeriesHandler(ISeriesHandler):
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
     def select_season(self, update: Update, context: CallbackContext):
-        MessagesHandler.delete_and_add_new_message(context, update, ".. 👀")
+        MessagesHandler.delete_current_and_add_new(context, update, ".. 👀")
 
         query = update.callback_query
 
@@ -45,7 +45,7 @@ class SeriesHandler(ISeriesHandler):
 
         keyboard = Keyboard.seasons(seasons)
 
-        MessagesHandler.delete_and_add_new_message(context, update, "Select Season:", keyboard)
+        MessagesHandler.delete_current_and_add_new(context, update, "Select Season:", keyboard)
 
     @staticmethod
     def _set_seasons(context: CallbackContext, position: int):

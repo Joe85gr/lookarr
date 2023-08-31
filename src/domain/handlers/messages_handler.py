@@ -59,7 +59,7 @@ class MessagesHandler:
             MessagesHandler.new_message(update, reply)
 
     @staticmethod
-    def delete_and_add_new_message(
+    def delete_current_and_add_new(
             context: CallbackContext,
             update: Update,
             reply: str = None,
