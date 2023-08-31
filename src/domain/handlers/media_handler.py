@@ -7,7 +7,7 @@ from src.domain.checkers.authentication_checker import check_user_is_authenticat
 from src.domain.checkers.conversation_checker import check_conversation
 from src.domain.checkers.search_checker import check_search_is_valid
 from src.domain.config.app_config import Config
-from src.domain.handlers.interfaces.iconversation_handler import IMediaHandler
+from src.domain.handlers.interfaces.imedia_handler import IMediaHandler
 from src.domain.handlers.messages_handler import MessagesHandler
 from src.domain.handlers.stop_handler import stop_handler
 from src.infrastructure.folder import Folder
@@ -31,10 +31,15 @@ class MediaHandler(IMediaHandler):
 
     @check_user_is_authenticated
     @check_search_is_valid()
-    def search(self, update: Update, context: CallbackContext):
-        keyboard = Keyboard.search()
-
-        MessagesHandler.new_message(update, "What you're looking for? 🧐:", keyboard)
+    def start_search(self, update: Update, context: CallbackContext):
+        if self._config.active_media_servers == 0:
+            MessagesHandler.new_message(update, "Bro, all media servers are disabled in the config.. 🙄")
+            return ConversationHandler.END
+        elif self._config.active_media_servers == 1:
+            self._set_media_type(self._config.default_media_server, context)
+        else:
+            keyboard = Keyboard.search()
+            MessagesHandler.new_message(update, "What you're looking for? 🧐:", keyboard)
 
     @check_user_is_authenticated
     @check_conversation(["update_msg"])
@@ -52,6 +57,8 @@ class MediaHandler(IMediaHandler):
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
     def get_folders(self, update: Update, context: CallbackContext):
+        MessagesHandler.update_message(context, update, ".. 👀")
+
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
         folders = media_server.media_server.get_root_folders()
 
@@ -73,6 +80,8 @@ class MediaHandler(IMediaHandler):
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
     def get_quality_profiles(self, update: Update, context: CallbackContext):
+        MessagesHandler.update_message(context, update, ".. 👀")
+
         query = update.callback_query
 
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
@@ -91,6 +100,8 @@ class MediaHandler(IMediaHandler):
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
     def add_to_library(self, update: Update, context: CallbackContext):
+        MessagesHandler.update_message(context, update, ".. 👀")
+
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
 
         content_added = media_server.media_server.add_to_library(context.user_data)
@@ -111,6 +122,8 @@ class MediaHandler(IMediaHandler):
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
     def confirm_delete(self, update: Update, context: CallbackContext):
+        MessagesHandler.update_message(context, update, ".. 👀")
+
         position = context.user_data["position"]
         title_to_remove = context.user_data['results'][position]['title']
         message = f"You sure you want to remove {title_to_remove} from your Library? 😱"
@@ -122,6 +135,8 @@ class MediaHandler(IMediaHandler):
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
     def delete(self, update: Update, context: CallbackContext):
+        MessagesHandler.update_message(context, update, ".. 👀")
+
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
 
         position = context.user_data["position"]
@@ -140,12 +155,17 @@ class MediaHandler(IMediaHandler):
         stop_handler.clear_user_data(update, context, False)
         return ConversationHandler.END
 
+    @staticmethod
+    def _set_media_type(media_type: str, context: CallbackContext):
+        context.user_data["type"] = media_type
+
     @check_user_is_authenticated
     @check_conversation(["reply"])
     def search_media(self, update: Update, context: CallbackContext) -> None | int:
         query = update.callback_query
 
-        context.user_data["type"] = update.callback_query.data
+        if "type" not in context.user_data:
+            self._set_media_type(update.callback_query.data, context)
 
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
 
@@ -161,16 +181,13 @@ class MediaHandler(IMediaHandler):
         context.user_data["position"] = 0
         context.user_data["results"] = results
 
-        query.delete_message()
+        # query.delete_message()
 
         self.show_medias(update, context)
 
     @check_user_is_authenticated
     def show_medias(self, update: Update, context: CallbackContext):
         position = context.user_data["position"]
-
-        if "update_msg" in context.user_data:
-            MessagesHandler.update_message(context, update, ".. 👀")
 
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
 

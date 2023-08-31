@@ -6,7 +6,7 @@ from kink import inject
 from src.dependencies.services import configure_services
 
 from src.domain.handlers.interfaces.iauthentication_handler import IAuthHandler
-from src.domain.handlers.interfaces.iconversation_handler import IMediaHandler
+from src.domain.handlers.interfaces.imedia_handler import IMediaHandler
 
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 from src.domain.config.app_config import Config
@@ -44,11 +44,11 @@ def main(
 
     updater = Updater(environ.get("TELEGRAM_BOT_KEY"))
 
-    updater.dispatcher.add_handler(CommandHandler(config.lookarr.search_all_command, media_handler.search))
-    updater.dispatcher.add_handler(CallbackQueryHandler(movie_handler.add_to_library, pattern="MovieQuality"))
+    updater.dispatcher.add_handler(CommandHandler(config.lookarr.search_all_command, media_handler.start_search))
+    updater.dispatcher.add_handler(CallbackQueryHandler(movie_handler.add_to_library, pattern="RadarrQuality"))
     updater.dispatcher.add_handler(CallbackQueryHandler(movie_handler.add_to_library, pattern="AddSeries"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(series_handler.set_quality, pattern="SeriesQuality"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(media_handler.search_media, pattern="Series|Movie"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(series_handler.set_quality, pattern="SonarrQuality"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(media_handler.search_media, pattern="Sonarr|Radarr"))
     updater.dispatcher.add_handler(CallbackQueryHandler(media_handler.change_option,
                                                         pattern="Next|Previous"))
     updater.dispatcher.add_handler(CallbackQueryHandler(media_handler.get_folders, pattern="GetFolders"))

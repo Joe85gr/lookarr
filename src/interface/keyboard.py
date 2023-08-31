@@ -49,8 +49,9 @@ class Keyboard:
 
         keyboard.append([Buttons.stop_button()])
 
-        first_button_text = "Unselect" if all_selected else "All"
-        keyboard.insert(0, [Buttons.season_button(first_button_text)])
+        if len(seasons) > 1:
+            first_button_text = "Unselect" if all_selected else "All"
+            keyboard.insert(0, [Buttons.season_button(first_button_text)])
 
         return keyboard
 

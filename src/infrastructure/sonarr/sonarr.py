@@ -27,10 +27,6 @@ class Sonarr(IMediaServerRepository):
         return ApiConfig(url=self._config.url, port=self._config.port)
 
     @property
-    def media_type_name(self) -> str:
-        return "Series"
-
-    @property
     def media_type(self):
         return Series
 

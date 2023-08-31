@@ -4,7 +4,7 @@ from kink import inject
 
 from src.domain.checkers.authentication_checker import check_user_is_authenticated
 from src.domain.checkers.conversation_checker import check_conversation
-from src.domain.handlers.interfaces.iconversation_handler import IMediaHandler
+from src.domain.handlers.interfaces.imedia_handler import IMediaHandler
 from src.domain.handlers.interfaces.iseries_handler import ISeriesHandler
 from src.domain.handlers.messages_handler import MessagesHandler
 from src.interface.keyboard import Keyboard
@@ -23,13 +23,15 @@ class SeriesHandler(ISeriesHandler):
         query = update.callback_query
 
         if not context.user_data.get("quality_profile"):
-            context.user_data["quality_profile"] = query.data.removeprefix("SeriesQuality: ")
+            context.user_data["quality_profile"] = query.data.removeprefix("SonarrQuality: ")
 
         self.select_season(update, context)
 
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
     def select_season(self, update: Update, context: CallbackContext):
+        MessagesHandler.update_message(context, update, ".. 👀")
+
         query = update.callback_query
 
         position = context.user_data["position"]

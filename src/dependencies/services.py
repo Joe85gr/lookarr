@@ -22,7 +22,7 @@ from src.infrastructure.radarr.radarr import Radarr
 from src.domain.handlers.authentication_handler import AuthHandler
 from src.domain.handlers.interfaces.iauthentication_handler import IAuthHandler
 from src.domain.handlers.media_handler import MediaHandler
-from src.domain.handlers.interfaces.iconversation_handler import IMediaHandler
+from src.domain.handlers.interfaces.imedia_handler import IMediaHandler
 from src.domain.handlers.interfaces.istop_handler import IStopHandler
 from src.domain.handlers.stop_handler import StopHandler
 from src.infrastructure.sonarr.sonarr import Sonarr

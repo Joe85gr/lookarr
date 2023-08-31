@@ -38,8 +38,11 @@ class MessagesHandler:
     def new_message(
             update: Update,
             reply: str,
-            keyboard: list
+            keyboard: list = None
     ):
+        if keyboard is None:
+            keyboard = []
+
         reply_markup = InlineKeyboardMarkup(keyboard)
 
         update.message.reply_text(reply, reply_markup=reply_markup)
