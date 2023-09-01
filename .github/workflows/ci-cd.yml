@@ -2,7 +2,15 @@ name: Python package
 
 on: [push]
 
+permissions:
+  contents: write
+
 jobs:
 
-  test:
-    uses: ./.github/workflows/_test.yml
+  build:
+    uses: ./.github/workflows/_build.yml
+
+  push:
+    needs: [ build ]
+    uses: ./.github/workflows/_push.yml
+    secrets: inherit
