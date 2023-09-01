@@ -19,6 +19,23 @@ class SeriesHandler(ISeriesHandler):
 
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
+    def check_default_quality_profile(self, update: Update, context: CallbackContext):
+        media_server = self._media_server_factory.get_media_server(context.user_data["type"])
+
+        if media_server.media_server.default_quality_profile:
+            qualityProfiles = media_server.media_server.get_quality_profiles()
+            quality_profile = next((profile for profile in qualityProfiles
+                                    if profile["Name"] == media_server.media_server.default_quality_profile),
+                                   None)
+
+            if quality_profile:
+                context.user_data["quality_profile"] = quality_profile["Id"]
+                self._conversation_handler.add_to_library(update, context)
+
+        self._conversation_handler.get_quality_profiles(update, context)
+
+    @check_user_is_authenticated
+    @check_conversation(["update_msg", "type"])
     def set_quality(self, update: Update, context: CallbackContext):
         query = update.callback_query
 

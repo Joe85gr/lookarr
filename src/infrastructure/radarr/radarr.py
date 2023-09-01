@@ -21,6 +21,10 @@ class Radarr(IMediaServerRepository):
         self._api_key_identifier = "RADARR_API_KEY"
 
     @property
+    def default_quality_profile(self):
+        return self._config.default_quality_profile
+
+    @property
     def _api_query(self):
         return ApiConfig(url=self._config.url, port=self._config.port)
 

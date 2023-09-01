@@ -46,8 +46,8 @@ def main(
 
     updater.dispatcher.add_handler(CommandHandler(config.lookarr.search_all_command, media_handler.start_search))
     updater.dispatcher.add_handler(CallbackQueryHandler(movie_handler.add_to_library, pattern="RadarrQuality"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(media_handler.add_to_library, pattern="AddSeries"))
     updater.dispatcher.add_handler(CallbackQueryHandler(series_handler.set_quality, pattern="SonarrQuality"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(media_handler.add_to_library, pattern="AddSeries"))
     updater.dispatcher.add_handler(CallbackQueryHandler(media_handler.search_media, pattern="Sonarr|Radarr"))
     updater.dispatcher.add_handler(CallbackQueryHandler(media_handler.change_option,
                                                         pattern="Next|Previous"))

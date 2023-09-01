@@ -34,6 +34,20 @@ class Buttons:
         )
 
     @staticmethod
+    def quality_profile_button(quality_profile: QualityProfile, media_type: str):
+        return InlineKeyboardButton(
+            f"Quality: {quality_profile.name}",
+            callback_data=f"{media_type}Quality: {quality_profile.id}"
+        )
+
+    @staticmethod
+    def path_button(folder: Folder):
+        return InlineKeyboardButton(
+            f"Path: {folder.path}, Free: {folder.availableSpace}",
+            callback_data=f"GetQualityProfiles: {folder.path}"
+        )
+
+    @staticmethod
     def next_button():
         return InlineKeyboardButton(
             "Next result" + ' \U000023ED',
@@ -45,20 +59,6 @@ class Buttons:
         return InlineKeyboardButton(
             '\U000023EE ' + "Previous result",
             callback_data="Previous"
-        )
-
-    @staticmethod
-    def path_button(folder: Folder):
-        return InlineKeyboardButton(
-            f"Path: {folder.path}, Free: {folder.availableSpace}",
-            callback_data=f"GetQualityProfiles: {folder.path}"
-        )
-
-    @staticmethod
-    def quality_profile_button(quality_profile: QualityProfile, media_type: str):
-        return InlineKeyboardButton(
-            f"Quality: {quality_profile.name}",
-            callback_data=f"{media_type}Quality: {quality_profile.id}"
         )
 
     @staticmethod

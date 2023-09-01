@@ -7,8 +7,10 @@ radarr:
   enabled: True
   url: 0.0.0.0
   port: 7878
+  default_quality_profile:
 
 sonarr:
   enabled: False
   url: 0.0.0.0
   port: 8989
+  default_quality_profile:
