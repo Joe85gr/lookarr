@@ -64,8 +64,11 @@ class MessagesHandler:
     @staticmethod
     def delete_current(update: Update, context: CallbackContext):
         if "update_msg" in context.user_data:
-            context.bot.delete_message(chat_id=update.effective_message.chat_id,
-                                       message_id=context.user_data["update_msg"])
+            try:
+                context.bot.delete_message(chat_id=update.effective_message.chat_id,
+                                           message_id=context.user_data["update_msg"])
+            except BadRequest:
+                pass
 
     @staticmethod
     def delete_current_and_add_new(
@@ -74,7 +77,10 @@ class MessagesHandler:
             reply: str = None,
             keyboard: list = None
     ):
-        MessagesHandler.delete_current(update, context)
+        try:
+            MessagesHandler.delete_current(update, context)
+        except BadRequest:
+            pass
 
         if reply:
             if keyboard is None:

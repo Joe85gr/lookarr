@@ -48,7 +48,8 @@ def main(
     updater.dispatcher.add_handler(CallbackQueryHandler(movie_handler.add_to_library, pattern="RadarrQuality"))
     updater.dispatcher.add_handler(CallbackQueryHandler(series_handler.set_quality, pattern="SonarrQuality"))
     updater.dispatcher.add_handler(CallbackQueryHandler(media_handler.add_to_library, pattern="AddSeries"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(media_handler.get_folders, pattern="GetFolders"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(movie_handler.get_folders, pattern="RadarrGetFolders"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(series_handler.get_folders, pattern="SonarrGetFolders"))
     updater.dispatcher.add_handler(CallbackQueryHandler(movie_handler.get_quality_profiles,
                                                         pattern="RadarrGetQualityProfiles"))
     updater.dispatcher.add_handler(CallbackQueryHandler(series_handler.get_quality_profiles,

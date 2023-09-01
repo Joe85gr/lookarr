@@ -27,10 +27,10 @@ class Buttons:
         )
 
     @staticmethod
-    def add_button():
+    def add_button(media_type: str):
         return InlineKeyboardButton(
             "Add",
-            callback_data="GetFolders"
+            callback_data=f"{media_type}GetFolders"
         )
 
     @staticmethod

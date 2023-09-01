@@ -14,11 +14,11 @@ class IMediaHandler(ABC):
         """Change the current option"""
 
     @abstractmethod
-    def get_folders(self, update: Update, context: CallbackContext) -> None | int:
+    def get_folders(self, update: Update, context: CallbackContext, default_folder_action):
         """Get the available folders"""
 
     @abstractmethod
-    def get_quality_profiles(self, update: Update, context: CallbackContext) -> None | int:
+    def get_quality_profiles(self, update: Update, context: CallbackContext, default_profile_action):
         """Get the available quality profiles"""
 
     @abstractmethod

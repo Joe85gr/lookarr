@@ -1,4 +1,7 @@
+from kink import di
 from unittest.mock import Mock, patch, MagicMock
+
+from src.domain.checkers.idefaults_checker import IDefaultValuesChecker
 from tests.mockers.mock_decorators import mock_check_user_is_authenticated, mock_check_check_conversation
 
 mock_check_user_is_authenticated()
@@ -11,6 +14,7 @@ class Test_SearchHandler:
     @patch.object(MediaHandler, 'show_medias', MagicMock())
     def test_option_change(self):
         # Arrange
+        di[IDefaultValuesChecker] = Mock()
         update = Mock()
         context = Mock()
         update.callback_query = Mock()

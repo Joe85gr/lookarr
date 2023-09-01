@@ -5,6 +5,7 @@ from kink import inject
 
 from src.domain.checkers.authentication_checker import check_user_is_authenticated
 from src.domain.checkers.conversation_checker import check_conversation
+from src.domain.checkers.idefaults_checker import IDefaultValuesChecker
 from src.domain.checkers.search_checker import check_search_is_valid
 from src.domain.config.app_config import Config
 from src.domain.handlers.interfaces.imedia_handler import IMediaHandler
@@ -24,10 +25,12 @@ class MediaHandler(IMediaHandler):
             media_server_factory: IMediaServerFactory,
             logger: ILogger,
             config: Config,
+            defaults: IDefaultValuesChecker,
     ):
         self._logger = logger
         self._config = config
         self._media_server_factory = media_server_factory
+        self._defaults = defaults
 
     @check_user_is_authenticated
     @check_search_is_valid()
@@ -55,27 +58,46 @@ class MediaHandler(IMediaHandler):
 
         self.show_medias(update, context)
 
-    @check_user_is_authenticated
-    @check_conversation(["update_msg", "type"])
-    def get_folders(self, update: Update, context: CallbackContext):
+    def get_folders(self, update: Update, context: CallbackContext, default_folder_action):
         MessagesHandler.delete_current_and_add_new(context, update, ".. 👀")
 
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
+        valid_values = media_server.media_server.get_root_folders()
+        default_is_valid = self._defaults.is_valid(profile_name="path",
+                                                   profile_name_identifier="path",
+                                                   profile_key_identifier="path",
+                                                   valid_values=valid_values,
+                                                   media_server=media_server,
+                                                   context=context
+                                                   )
+
+        if default_is_valid:
+            context.user_data["path"] = media_server.media_server.defaults["path"]
+            default_folder_action(update, context)
+            return
+
         folders = media_server.media_server.get_root_folders()
 
         results = [from_dict(data_class=Folder, data=folder) for folder in folders]
 
-        # if len(results) == 1:
-        #     context.user_data["path"] = results[0].path
-        #     self.get_quality_profiles(update, context)
-        #     return
-
         keyboard = Keyboard.folders(results, context.user_data["type"])
-
         MessagesHandler.delete_current_and_add_new(context, update, "Select Path:", keyboard)
 
-    def get_quality_profiles(self, update: Update, context: CallbackContext):
+    def get_quality_profiles(self, update: Update, context: CallbackContext, default_profile_action):
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
+
+        query = update.callback_query
+
+        if not "path" in context.user_data:
+            context.user_data["path"] = query.data.removeprefix(f"{context.user_data['type']}GetQualityProfiles: ")
+
+        valid_values = media_server.media_server.get_quality_profiles()
+        has_default_profile = self._defaults.is_valid(
+            "quality_profile", "name", "id", valid_values, media_server, context)
+
+        if has_default_profile:
+            default_profile_action(update, context)
+            return
 
         qualityProfiles = media_server.media_server.get_quality_profiles()
 
@@ -182,7 +204,13 @@ class MediaHandler(IMediaHandler):
         current = results[position]
         context.user_data["id"] = current.id
 
-        keyboard = Keyboard.medias(current.is_in_library, current.hasFile, len(results), position)
+        keyboard = Keyboard.medias(
+            current.is_in_library,
+            current.hasFile,
+            len(results),
+            position,
+            context.user_data["type"]
+        )
 
         message = f"\n\n<b>{current.title} ({current.year})</b>"
 

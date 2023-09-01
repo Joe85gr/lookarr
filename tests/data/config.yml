@@ -9,7 +9,7 @@ radarr:
   port: 7878
   defaults:
     quality_profile: Any
-    folder:
+    path: /movie
 
 sonarr:
   enabled: True
@@ -17,4 +17,4 @@ sonarr:
   port: 8989
   defaults:
     quality_profile: Any
-    folder:
+    path:

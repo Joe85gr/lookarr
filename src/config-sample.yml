@@ -9,6 +9,7 @@ radarr:
   port: 7878
   defaults:
     quality_profile: Any
+    path:
 
 sonarr:
   enabled: True
@@ -16,3 +17,4 @@ sonarr:
   port: 8989
   defaults:
     quality_profile: Any
+    path:
