@@ -76,7 +76,7 @@ class MediaHandler(IMediaHandler):
 
         keyboard = Keyboard.folders(results)
 
-        MessagesHandler.delete_current_and_add_new(context, update, "Select Download Path:", keyboard)
+        MessagesHandler.delete_current_and_add_new(context, update, "Select Path:", keyboard)
 
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
@@ -204,7 +204,7 @@ class MediaHandler(IMediaHandler):
             if current.hasFile:
                 message += f" Ready to watch! 🥳"
             elif current.hasFile is not None:
-                message += f"\n\n⚠️ It looks like it's still downloading 🙄"
+                message += f"\n\n⚠️ It looks like you still can't watch it though.. 🙄"
 
         if current.overview:
             message += f"\n\n{current.overview}"

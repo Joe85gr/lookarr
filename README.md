@@ -2,9 +2,17 @@
 Telegram bot for managing Sonarr and Radarr.
 
 ## Overview
-![Lookarr_Add](./imgs/banner_add.png)
---
-![Lookarr_Add](./imgs/banner_in_library.png)
+<div>
+    <img src="./imgs/banner_add.jpg" width="450" height="588">
+<div>
+</br>
+<div>
+    <img src="./imgs/banner_in_library.jpg" width="450" height="697">
+<div>
+</br>
+<div>
+    <img src="./imgs/banner_not_ready.jpg" width="450" height="656">
+<div>
 
 ## How to run with docker
 Rename config-sample.yml to config.yml and set it before running
@@ -31,7 +39,8 @@ Requires python 3.10+
 export PYTHONPATH=.
 export TELEGRAM_BOT_KEY=YOUR_TELEGRAM_BOT_KEY 
 export LOOKARR_AUTH_PASSWORD=YOUR_LOOKARR_AUTH_PASSWORD 
-export RADARR_API_KEY=YOUR_RADARR_API_KEY -e SONARR_API_KEY=YOUR_SONARR_API_KEY
+export RADARR_API_KEY=YOUR_RADARR_API_KEY 
+export SONARR_API_KEY=YOUR_SONARR_API_KEY
 
 python ./src/main.py
 ```

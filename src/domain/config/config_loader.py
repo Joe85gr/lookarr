@@ -10,14 +10,22 @@ class ConfigLoader:
     def __init__(self, logger: ILogger):
         self._logger = logger
 
-    def load_config(self, path: str) -> Config:
+    def load_config(self, config_full_path: str) -> Config:
         try:
-            with open(f"{path}", "r") as file:
+            with open(f"{config_full_path}", "r") as file:
                 rawConfig = safe_load(file)
 
             return Config(**rawConfig)
-        except FileNotFoundError as e:
-            self._logger.error(f"Config file not found at {path}. "
-                               f"Please rename the config-sample file to config.yml and set your config.")
-            raise e
+        except FileNotFoundError:
+            import shutil
+            from os import path
+            from pathlib import Path
 
+            self._logger.error(f"Config file not found at {config_full_path}. "
+                               f"Creating default config..")
+
+            config_path = Path(config_full_path).parent
+            sample_config_path = Path(__file__).parents[2]
+            shutil.copyfile(f"{sample_config_path}/config-sample.yml", config_full_path)
+
+            return self.load_config(f"{config_path}/config.yml")
