@@ -47,7 +47,7 @@ jobs:
       - name: Zip Release
         run: |
           mkdir release
-          zip -r ./release/lookarr.${{ steps.tag.outputs.tag }}.zip ./artifacts/*
+          zip -r ./release/lookarr.${{ steps.tag.outputs.tag }}.zip ./release/*
 
       - name: Release
         uses: ncipollo/release-action@v1
