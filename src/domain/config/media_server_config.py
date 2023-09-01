@@ -1,10 +1,10 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Any
 
 
 @dataclass
 class MediaServerConfig:
     url: Optional[str]
     port: Optional[str]
+    defaults: Optional[dict[str, Any]]
     enabled: Optional[bool] = False
-    default_quality_profile: Optional[str] = None

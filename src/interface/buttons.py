@@ -41,10 +41,10 @@ class Buttons:
         )
 
     @staticmethod
-    def path_button(folder: Folder):
+    def path_button(folder: Folder, media_type: str):
         return InlineKeyboardButton(
             f"Path: {folder.path}, Free: {folder.availableSpace}",
-            callback_data=f"GetQualityProfiles: {folder.path}"
+            callback_data=f"{media_type}GetQualityProfiles: {folder.path}"
         )
 
     @staticmethod

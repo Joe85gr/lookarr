@@ -4,7 +4,7 @@ from abc import abstractmethod, ABC
 class IMediaServerRepository(ABC):
     @property
     @abstractmethod
-    def default_quality_profile(self):
+    def defaults(self) -> dict:
         """Returns Default Quality Profile"""
 
     @property

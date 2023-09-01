@@ -63,32 +63,19 @@ class MediaHandler(IMediaHandler):
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
         folders = media_server.media_server.get_root_folders()
 
-        if not folders:
-            MessagesHandler.delete_current_and_add_new(
-                context,
-                update,
-                "I couldn't retrieve the available folders 😔 not much I can do really.."
-            )
-            stop_handler.clear_user_data(update, context)
-            return ConversationHandler.END
-
         results = [from_dict(data_class=Folder, data=folder) for folder in folders]
 
-        keyboard = Keyboard.folders(results)
+        # if len(results) == 1:
+        #     context.user_data["path"] = results[0].path
+        #     self.get_quality_profiles(update, context)
+        #     return
+
+        keyboard = Keyboard.folders(results, context.user_data["type"])
 
         MessagesHandler.delete_current_and_add_new(context, update, "Select Path:", keyboard)
 
-    @check_user_is_authenticated
-    @check_conversation(["update_msg", "type"])
     def get_quality_profiles(self, update: Update, context: CallbackContext):
-        MessagesHandler.delete_current_and_add_new(context, update, ".. 👀")
-
-        query = update.callback_query
-
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
-
-        if not context.user_data.get("path"):
-            context.user_data["path"] = query.data.removeprefix("GetQualityProfiles: ")
 
         qualityProfiles = media_server.media_server.get_quality_profiles()
 

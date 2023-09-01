@@ -6,6 +6,10 @@ from telegram.ext import CallbackContext
 
 class ISeriesHandler(ABC):
     @abstractmethod
+    def get_quality_profiles(self, update: Update, context: CallbackContext):
+        """Get quality profiles or set default quality profile"""
+
+    @abstractmethod
     def set_quality(self, update: Update, context: CallbackContext):
         """Set quality"""
 

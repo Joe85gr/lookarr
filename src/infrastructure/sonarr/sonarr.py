@@ -23,8 +23,8 @@ class Sonarr(IMediaServerRepository):
         self._api_key_identifier = "SONARR_API_KEY"
 
     @property
-    def default_quality_profile(self):
-        return self._config.default_quality_profile
+    def defaults(self) -> dict:
+        return self._config.defaults
 
     @property
     def _api_query(self):

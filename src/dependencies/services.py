@@ -2,6 +2,8 @@ from kink import di
 from typing import List
 import requests
 from src.constants import CONFIG_FULL_PATH
+from src.domain.checkers.defaults_checker import DefaultValuesChecker
+from src.domain.checkers.idefaults_checker import IDefaultValuesChecker
 from src.domain.config.app_config import Config
 from src.domain.config.config_loader import ConfigLoader
 from src.domain.handlers.help_handler import HelpHandler
@@ -34,6 +36,8 @@ def configure_services() -> None:
     di[IAuth] = Auth()
     di["client"] = requests
 
+    di[IDefaultValuesChecker] = DefaultValuesChecker()
+
     di[IMediaServerRepositoryBase] = MediaServer()
 
     di[List[IMediaServerRepository]] = [
@@ -44,7 +48,7 @@ def configure_services() -> None:
     di[IMediaServerFactory] = MediaServerFactory()
     di[IAuthHandler] = AuthHandler()
     di[IMediaHandler] = MediaHandler()
-    di[ISeriesHandler] = SeriesHandler()
-    di[IMovieHandler] = MovieHandler()
     di[IStopHandler] = StopHandler()
     di[IHelpHandler] = HelpHandler()
+    di[IMovieHandler] = MovieHandler()
+    di[ISeriesHandler] = SeriesHandler()

@@ -5,8 +5,8 @@ from src.interface.buttons import Buttons
 
 class Keyboard:
     @staticmethod
-    def folders(folders: list[Folder]):
-        return [[Buttons.path_button(folder)] for folder in folders] + [[Buttons.stop_button()]]
+    def folders(folders: list[Folder], media_type: str):
+        return [[Buttons.path_button(folder, media_type)] for folder in folders] + [[Buttons.stop_button()]]
 
     @staticmethod
     def search():

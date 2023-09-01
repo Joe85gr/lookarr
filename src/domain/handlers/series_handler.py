@@ -2,6 +2,8 @@ from telegram import Update
 from telegram.ext import CallbackContext
 from kink import inject
 
+from src.domain.checkers.idefaults_checker import IDefaultValuesChecker
+from src.infrastructure.interfaces.imedia_server_factory import IMediaServerFactory
 from src.domain.checkers.authentication_checker import check_user_is_authenticated
 from src.domain.checkers.conversation_checker import check_conversation
 from src.domain.handlers.interfaces.imedia_handler import IMediaHandler
@@ -13,26 +15,29 @@ from src.logger import ILogger
 
 @inject
 class SeriesHandler(ISeriesHandler):
-    def __init__(self, logger: ILogger, conversation_handler: IMediaHandler):
-        self._logger = logger,
+    def __init__(self,
+                 media_server_factory: IMediaServerFactory,
+                 logger: ILogger,
+                 conversation_handler: IMediaHandler,
+                 defaults: IDefaultValuesChecker
+                 ):
+        self._media_server_factory = media_server_factory
+        self._logger = logger
         self._conversation_handler = conversation_handler
+        self._defaults = defaults
 
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
-    def check_default_quality_profile(self, update: Update, context: CallbackContext):
+    def get_quality_profiles(self, update: Update, context: CallbackContext):
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
 
-        if media_server.media_server.default_quality_profile:
-            qualityProfiles = media_server.media_server.get_quality_profiles()
-            quality_profile = next((profile for profile in qualityProfiles
-                                    if profile["Name"] == media_server.media_server.default_quality_profile),
-                                   None)
+        valid_values = media_server.media_server.get_quality_profiles()
+        has_default_profile = self._defaults.check_defaults("quality_profile", valid_values, media_server, context)
 
-            if quality_profile:
-                context.user_data["quality_profile"] = quality_profile["Id"]
-                self._conversation_handler.add_to_library(update, context)
-
-        self._conversation_handler.get_quality_profiles(update, context)
+        if has_default_profile:
+            self.select_season(update, context)
+        else:
+            self._conversation_handler.get_quality_profiles(update, context)
 
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
