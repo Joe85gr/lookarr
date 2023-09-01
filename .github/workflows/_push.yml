@@ -18,7 +18,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: lookarr
-          path: ./release
+          path: ./artifacts
 
       - name: Semantic versioning
         id: versioning
@@ -47,7 +47,7 @@ jobs:
       - name: Zip Release
         run: |
           mkdir release
-          zip -r ./release/lookarr.${{ steps.tag.outputs.tag }}.zip ./release/*
+          zip -r ./release/lookarr.${{ steps.tag.outputs.tag }}.zip ./artifacts/*
 
       - name: Release
         uses: ncipollo/release-action@v1
