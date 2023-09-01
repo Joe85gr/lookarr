@@ -28,4 +28,4 @@ class ConfigLoader:
             sample_config_path = Path(__file__).parents[2]
             shutil.copyfile(f"{sample_config_path}/config-sample.yml", config_full_path)
 
-            self.load_config(f"{config_path}/config.yml")
+            return self.load_config(f"{config_path}/config.yml")
