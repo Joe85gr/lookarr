@@ -4,5 +4,8 @@ on: [push]
 
 jobs:
 
-  test:
+  build:
     uses: ./.github/workflows/_build.yml
+
+  push:
+    uses: ./.github/workflows/_push.yml
