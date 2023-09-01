@@ -62,7 +62,7 @@ class Keyboard:
         elif has_file is None or has_file:
             keyboard = [[Buttons.delete_button()]]
         else:
-            keyboard = [[Buttons.delete_button("Cancel Download")]]
+            keyboard = [[Buttons.delete_button("Cancel")]]
 
         if results_count > 1 and results_count > current_position == 0:  # show next
             keyboard.append([Buttons.next_button()])
