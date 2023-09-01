@@ -1,4 +1,4 @@
-name: _test
+name: _build
 
 on:
   workflow_call:
@@ -6,7 +6,7 @@ on:
 
 jobs:
 
-  Test:
+  Build:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -23,3 +23,12 @@ jobs:
 
       - name: Run Tests
         run: ./scripts/test.sh
+
+      - name: Build Package
+        run: ./scripts/build.sh
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: lookarr
+          path: ./dist/*
