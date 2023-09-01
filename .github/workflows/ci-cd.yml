@@ -10,3 +10,4 @@ jobs:
   push:
     needs: [ build ]
     uses: ./.github/workflows/_push.yml
+    secrets: inherit
