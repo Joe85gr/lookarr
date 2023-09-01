@@ -1,4 +1,4 @@
-FROM python:3.11 as build
+FROM python:3.9.18-slim as build
 
 WORKDIR /app
 
@@ -10,6 +10,7 @@ FROM python:alpine3.18
 ENV PYTHONPATH=/app
 
 COPY --from=build /app/src ./app/src
+COPY --from=build /app/user_config ./app/user_config
 COPY --from=build /app/user_config/config-sample.yml ./app/user_config/config.yml
 
 ENTRYPOINT ["python", "/app/src/main.py"]
