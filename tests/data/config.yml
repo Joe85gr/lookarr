@@ -5,10 +5,16 @@ lookarr:
 
 radarr:
   enabled: True
-  url: 10.66.66.10
+  url: 1.2.3.4
   port: 7878
+  defaults:
+    quality_profile: Any
+    path: /movie
 
 sonarr:
   enabled: True
-  url: 10.66.66.10
+  url: 1.2.3.4
   port: 8989
+  defaults:
+    quality_profile: Any
+    path:

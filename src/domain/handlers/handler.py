@@ -5,9 +5,10 @@ from kink import inject
 
 from src.domain.checkers.authentication_checker import check_user_is_authenticated
 from src.domain.checkers.conversation_checker import check_conversation
+from src.domain.checkers.idefaults_checker import IDefaultValuesChecker
 from src.domain.checkers.search_checker import check_search_is_valid
 from src.domain.config.app_config import Config
-from src.domain.handlers.interfaces.imedia_handler import IMediaHandler
+from src.domain.handlers.interfaces.ihandler import IHandler
 from src.domain.handlers.messages_handler import MessagesHandler
 from src.domain.handlers.stop_handler import stop_handler
 from src.infrastructure.folder import Folder
@@ -18,16 +19,18 @@ from src.logger import ILogger
 
 
 @inject
-class MediaHandler(IMediaHandler):
+class Handler(IHandler):
     def __init__(
             self,
             media_server_factory: IMediaServerFactory,
             logger: ILogger,
             config: Config,
+            defaults: IDefaultValuesChecker,
     ):
         self._logger = logger
         self._config = config
         self._media_server_factory = media_server_factory
+        self._defaults = defaults
 
     @check_user_is_authenticated
     @check_search_is_valid()
@@ -36,7 +39,7 @@ class MediaHandler(IMediaHandler):
             MessagesHandler.new_message(update, context, "Bro, all media servers are disabled in the config.. 🙄")
             return ConversationHandler.END
         elif self._config.active_media_servers == 1:
-            self._set_media_type(self._config.default_media_server, context)
+            context.user_data["type"] = self._config.default_media_server
             self.search_media(update, context)
         else:
             keyboard = Keyboard.search()
@@ -55,40 +58,46 @@ class MediaHandler(IMediaHandler):
 
         self.show_medias(update, context)
 
-    @check_user_is_authenticated
-    @check_conversation(["update_msg", "type"])
-    def get_folders(self, update: Update, context: CallbackContext):
+    def get_folders(self, update: Update, context: CallbackContext, default_folder_action):
         MessagesHandler.delete_current_and_add_new(context, update, ".. 👀")
 
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
-        folders = media_server.media_server.get_root_folders()
+        valid_values = media_server.media_server.get_root_folders()
+        default_is_valid = self._defaults.is_valid(profile_name="path",
+                                                   profile_name_identifier="path",
+                                                   profile_key_identifier="path",
+                                                   valid_values=valid_values,
+                                                   media_server=media_server,
+                                                   context=context
+                                                   )
 
-        if not folders:
-            MessagesHandler.delete_current_and_add_new(
-                context,
-                update,
-                "I couldn't retrieve the available folders 😔 not much I can do really.."
-            )
-            stop_handler.clear_user_data(update, context)
-            return ConversationHandler.END
+        if default_is_valid:
+            context.user_data["path"] = media_server.media_server.defaults["path"]
+            default_folder_action(update, context)
+            return
+
+        folders = media_server.media_server.get_root_folders()
 
         results = [from_dict(data_class=Folder, data=folder) for folder in folders]
 
-        keyboard = Keyboard.folders(results)
-
+        keyboard = Keyboard.folders(results, context.user_data["type"])
         MessagesHandler.delete_current_and_add_new(context, update, "Select Path:", keyboard)
 
-    @check_user_is_authenticated
-    @check_conversation(["update_msg", "type"])
-    def get_quality_profiles(self, update: Update, context: CallbackContext):
-        MessagesHandler.delete_current_and_add_new(context, update, ".. 👀")
+    def get_quality_profiles(self, update: Update, context: CallbackContext, default_profile_action):
+        media_server = self._media_server_factory.get_media_server(context.user_data["type"])
 
         query = update.callback_query
 
-        media_server = self._media_server_factory.get_media_server(context.user_data["type"])
+        if not "path" in context.user_data:
+            context.user_data["path"] = query.data.removeprefix(f"{context.user_data['type']}GetQualityProfiles: ")
 
-        if not context.user_data.get("path"):
-            context.user_data["path"] = query.data.removeprefix("GetQualityProfiles: ")
+        valid_values = media_server.media_server.get_quality_profiles()
+        has_default_profile = self._defaults.is_valid(
+            "quality_profile", "name", "id", valid_values, media_server, context)
+
+        if has_default_profile:
+            default_profile_action(update, context)
+            return
 
         qualityProfiles = media_server.media_server.get_quality_profiles()
 
@@ -156,17 +165,12 @@ class MediaHandler(IMediaHandler):
         stop_handler.clear_user_data(update, context, False)
         return ConversationHandler.END
 
-    @staticmethod
-    def _set_media_type(media_type: str, context: CallbackContext):
-        context.user_data["type"] = media_type
-
     @check_user_is_authenticated
     @check_conversation(["reply"])
     def search_media(self, update: Update, context: CallbackContext) -> None | int:
         MessagesHandler.update_query_or_send_new(update, context, f"Looking for '{context.user_data['reply']}'..👀")
 
-        if "type" not in context.user_data:
-            self._set_media_type(update.callback_query.data, context)
+        context.user_data["type"] = update.callback_query.data
 
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
 
@@ -195,7 +199,13 @@ class MediaHandler(IMediaHandler):
         current = results[position]
         context.user_data["id"] = current.id
 
-        keyboard = Keyboard.medias(current.is_in_library, current.hasFile, len(results), position)
+        keyboard = Keyboard.medias(
+            current.is_in_library,
+            current.hasFile,
+            len(results),
+            position,
+            context.user_data["type"]
+        )
 
         message = f"\n\n<b>{current.title} ({current.year})</b>"
 

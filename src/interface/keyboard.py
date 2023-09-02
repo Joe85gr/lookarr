@@ -5,8 +5,8 @@ from src.interface.buttons import Buttons
 
 class Keyboard:
     @staticmethod
-    def folders(folders: list[Folder]):
-        return [[Buttons.path_button(folder)] for folder in folders] + [[Buttons.stop_button()]]
+    def folders(folders: list[Folder], media_type: str):
+        return [[Buttons.path_button(folder, media_type)] for folder in folders] + [[Buttons.stop_button()]]
 
     @staticmethod
     def search():
@@ -56,9 +56,14 @@ class Keyboard:
         return keyboard
 
     @staticmethod
-    def medias(is_in_library: bool, has_file: bool | None, results_count: int, current_position: int) -> list:
+    def medias(is_in_library: bool,
+               has_file: bool | None,
+               results_count: int,
+               current_position: int,
+               media_type: str
+               ) -> list:
         if not is_in_library:
-            keyboard = [[Buttons.add_button()]]
+            keyboard = [[Buttons.add_button(media_type)]]
         elif has_file is None or has_file:
             keyboard = [[Buttons.delete_button()]]
         else:

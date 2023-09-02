@@ -44,3 +44,22 @@ export SONARR_API_KEY=YOUR_SONARR_API_KEY
 
 python ./src/main.py
 ```
+
+## Config
+```yaml
+lookarr:
+  language: en-us # default language - not implemented at the moment
+  strict_mode_allowed_ids: [ ] # setting this will make it so the bot stay silent when contacted by user ids which are not in this list
+  search_all_command: search # command to search for a media
+
+radarr/sonarr: 
+  enabled: True # enable/disable media server
+  url: 0.0.0.0 # media server url
+  port: 0000 # media server port
+  defaults: # default profiles. If set and valid, you won't be asked to choose one when adding a media. 
+            # If you add invalid values, you will be asked to choose one.
+            # In this scenario, valid profiles will be logged, so you can change the config accordingly :)
+    quality_profile: # e.g. Any
+    path: # e.g. /media
+
+```

@@ -4,6 +4,11 @@ from abc import abstractmethod, ABC
 class IMediaServerRepository(ABC):
     @property
     @abstractmethod
+    def defaults(self) -> dict:
+        """Returns Default Quality Profile"""
+
+    @property
+    @abstractmethod
     def media_type(self):
         """Returns type of Media Server"""
 

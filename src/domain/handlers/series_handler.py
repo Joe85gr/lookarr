@@ -3,19 +3,34 @@ from telegram.ext import CallbackContext
 from kink import inject
 
 from src.domain.checkers.authentication_checker import check_user_is_authenticated
-from src.domain.checkers.conversation_checker import check_conversation
-from src.domain.handlers.interfaces.imedia_handler import IMediaHandler
 from src.domain.handlers.interfaces.iseries_handler import ISeriesHandler
+from src.domain.checkers.conversation_checker import check_conversation
 from src.domain.handlers.messages_handler import MessagesHandler
+from src.domain.handlers.interfaces.ihandler import IHandler
 from src.interface.keyboard import Keyboard
 from src.logger import ILogger
 
 
 @inject
 class SeriesHandler(ISeriesHandler):
-    def __init__(self, logger: ILogger, conversation_handler: IMediaHandler):
-        self._logger = logger,
-        self._conversation_handler = conversation_handler
+    def __init__(self,
+                 logger: ILogger,
+                 media_handler: IHandler,
+                 ):
+        self._logger = logger
+        self._media_handler = media_handler
+
+    @check_user_is_authenticated
+    @check_conversation(["update_msg", "type"])
+    def get_folders(self, update: Update, context: CallbackContext):
+        default_folder_action = self.get_quality_profiles
+        self._media_handler.get_folders(update, context, default_folder_action)
+
+    @check_user_is_authenticated
+    @check_conversation(["update_msg", "type"])
+    def get_quality_profiles(self, update: Update, context: CallbackContext):
+        default_profile_action = self.select_season
+        self._media_handler.get_quality_profiles(update, context, default_profile_action)
 
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
@@ -46,6 +61,11 @@ class SeriesHandler(ISeriesHandler):
         keyboard = Keyboard.seasons(seasons)
 
         MessagesHandler.delete_current_and_add_new(context, update, "Select Season:", keyboard)
+
+    @check_user_is_authenticated
+    @check_conversation(["update_msg", "type"])
+    def add_to_library(self, update: Update, context: CallbackContext):
+        self._media_handler.add_to_library(update, context)
 
     @staticmethod
     def _set_seasons(context: CallbackContext, position: int):
