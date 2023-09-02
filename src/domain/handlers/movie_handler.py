@@ -4,8 +4,8 @@ from kink import inject
 
 from src.domain.checkers.authentication_checker import check_user_is_authenticated
 from src.domain.checkers.conversation_checker import check_conversation
-from src.domain.handlers.interfaces.ihandler import IHandler
 from src.domain.handlers.interfaces.imovie_handler import IMovieHandler
+from src.domain.handlers.interfaces.ihandler import IHandler
 from src.logger import ILogger
 
 

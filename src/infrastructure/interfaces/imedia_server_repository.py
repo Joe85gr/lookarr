@@ -35,4 +35,3 @@ class IMediaServerRepository(ABC):
     @abstractmethod
     def get_quality_profiles(self):
         """Returns List Quality Profiles Set on the Library"""
-

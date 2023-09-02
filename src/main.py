@@ -61,7 +61,6 @@ def main(
                                                         pattern="Next|Previous"))
     updater.dispatcher.add_handler(CallbackQueryHandler(media_handler.delete, pattern="Delete"))
     updater.dispatcher.add_handler(CallbackQueryHandler(stop_handler.stop, pattern="Stop"))
-    # updater.dispatcher.add_handler(CallbackQueryHandler(test_handlers.add, pattern="Add_This"))
     updater.dispatcher.add_handler(CommandHandler('help', help_handler.help))
     updater.dispatcher.add_handler(CommandHandler('auth', authentication_handler.authenticate))
     updater.dispatcher.add_handler(CallbackQueryHandler(media_handler.search_media, pattern="Sonarr|Radarr"))
