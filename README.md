@@ -1,4 +1,8 @@
-# Lookarr
+<div style="display:flex; justify-content:center">
+   <img src="./imgs/lookarr.png" width="100" height="100">
+</div>
+
+# Lookarr 
 Telegram bot for managing Sonarr and Radarr.
 
 ## Overview
