@@ -4,7 +4,6 @@ from telegram.error import BadRequest
 from kink import inject
 
 from src.domain.checkers.authentication_checker import check_user_is_authenticated
-from src.domain.checkers.conversation_checker import answer_query
 from src.logger import ILogger
 
 
@@ -14,8 +13,9 @@ class StopHandler:
         self._logger = logger
 
     @check_user_is_authenticated
-    @answer_query()
     def stop(self, update, context):
+        update.callback_query.answer()
+
         self.clear_user_data(update, context)
 
         context.bot.send_message(chat_id=update.effective_message.chat_id, text="Ok, nothing to do for me then 🌝")
