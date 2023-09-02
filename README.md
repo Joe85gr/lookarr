@@ -61,5 +61,4 @@ radarr/sonarr:
             # In this scenario, valid profiles will be logged, so you can change the config accordingly :)
     quality_profile: # e.g. Any
     path: # e.g. /media
-
 ```
