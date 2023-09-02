@@ -23,8 +23,8 @@ from src.infrastructure.media_server_repository import IMediaServerRepositoryBas
 from src.infrastructure.radarr.radarr import Radarr
 from src.domain.handlers.authentication_handler import AuthHandler
 from src.domain.handlers.interfaces.iauthentication_handler import IAuthHandler
-from src.domain.handlers.media_handler import MediaHandler
-from src.domain.handlers.interfaces.imedia_handler import IMediaHandler
+from src.domain.handlers.handler import Handler
+from src.domain.handlers.interfaces.ihandler import IHandler
 from src.domain.handlers.interfaces.istop_handler import IStopHandler
 from src.domain.handlers.stop_handler import StopHandler
 from src.infrastructure.sonarr.sonarr import Sonarr
@@ -47,7 +47,7 @@ def configure_services() -> None:
 
     di[IMediaServerFactory] = MediaServerFactory()
     di[IAuthHandler] = AuthHandler()
-    di[IMediaHandler] = MediaHandler()
+    di[IHandler] = Handler()
     di[IStopHandler] = StopHandler()
     di[IHelpHandler] = HelpHandler()
     di[IMovieHandler] = MovieHandler()

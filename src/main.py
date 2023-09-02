@@ -6,7 +6,7 @@ from kink import inject
 from src.dependencies.services import configure_services
 
 from src.domain.handlers.interfaces.iauthentication_handler import IAuthHandler
-from src.domain.handlers.interfaces.imedia_handler import IMediaHandler
+from src.domain.handlers.interfaces.ihandler import IHandler
 
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 from src.domain.config.app_config import Config
@@ -35,7 +35,7 @@ def initialise(db: IDatabase, config: Config) -> None:
 def main(
         config: Config,
         authentication_handler: IAuthHandler,
-        media_handler: IMediaHandler,
+        media_handler: IHandler,
         series_handler: ISeriesHandler,
         movie_handler: IMovieHandler,
         stop_handler: IStopHandler,
@@ -47,7 +47,7 @@ def main(
     updater.dispatcher.add_handler(CommandHandler(config.lookarr.search_all_command, media_handler.start_search))
     updater.dispatcher.add_handler(CallbackQueryHandler(movie_handler.add_to_library, pattern="RadarrQuality"))
     updater.dispatcher.add_handler(CallbackQueryHandler(series_handler.set_quality, pattern="SonarrQuality"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(media_handler.add_to_library, pattern="AddSeries"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(series_handler.add_to_library, pattern="AddSeries"))
     updater.dispatcher.add_handler(CallbackQueryHandler(movie_handler.get_folders, pattern="RadarrGetFolders"))
     updater.dispatcher.add_handler(CallbackQueryHandler(series_handler.get_folders, pattern="SonarrGetFolders"))
     updater.dispatcher.add_handler(CallbackQueryHandler(movie_handler.get_quality_profiles,

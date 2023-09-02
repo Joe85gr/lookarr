@@ -4,7 +4,7 @@ from kink import inject
 
 from src.domain.checkers.authentication_checker import check_user_is_authenticated
 from src.domain.checkers.conversation_checker import check_conversation
-from src.domain.handlers.interfaces.imedia_handler import IMediaHandler
+from src.domain.handlers.interfaces.ihandler import IHandler
 from src.domain.handlers.interfaces.iseries_handler import ISeriesHandler
 from src.domain.handlers.messages_handler import MessagesHandler
 from src.interface.keyboard import Keyboard
@@ -15,7 +15,7 @@ from src.logger import ILogger
 class SeriesHandler(ISeriesHandler):
     def __init__(self,
                  logger: ILogger,
-                 media_handler: IMediaHandler,
+                 media_handler: IHandler,
                  ):
         self._logger = logger
         self._media_handler = media_handler
@@ -61,6 +61,11 @@ class SeriesHandler(ISeriesHandler):
         keyboard = Keyboard.seasons(seasons)
 
         MessagesHandler.delete_current_and_add_new(context, update, "Select Season:", keyboard)
+
+    @check_user_is_authenticated
+    @check_conversation(["update_msg", "type"])
+    def add_to_library(self, update: Update, context: CallbackContext):
+        self._media_handler.add_to_library(update, context)
 
     @staticmethod
     def _set_seasons(context: CallbackContext, position: int):

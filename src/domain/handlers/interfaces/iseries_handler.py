@@ -3,14 +3,11 @@ from abc import ABC, abstractmethod
 from telegram import Update
 from telegram.ext import CallbackContext
 
+from src.domain.handlers.interfaces.imedia_handler import IMediaHandler
 
-class ISeriesHandler(ABC):
-    @abstractmethod
-    def get_folders(self, update: Update, context: CallbackContext):
-        """Get folders or set default folder"""
-    @abstractmethod
-    def get_quality_profiles(self, update: Update, context: CallbackContext):
-        """Get quality profiles or set default quality profile"""
+
+class ISeriesHandler(IMediaHandler, ABC):
+    """Series handler interface"""
 
     @abstractmethod
     def set_quality(self, update: Update, context: CallbackContext):

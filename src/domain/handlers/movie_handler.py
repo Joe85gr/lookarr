@@ -4,7 +4,7 @@ from kink import inject
 
 from src.domain.checkers.authentication_checker import check_user_is_authenticated
 from src.domain.checkers.conversation_checker import check_conversation
-from src.domain.handlers.interfaces.imedia_handler import IMediaHandler
+from src.domain.handlers.interfaces.ihandler import IHandler
 from src.domain.handlers.interfaces.imovie_handler import IMovieHandler
 from src.logger import ILogger
 
@@ -13,7 +13,7 @@ from src.logger import ILogger
 class MovieHandler(IMovieHandler):
     def __init__(self,
                  logger: ILogger,
-                 media_handler: IMediaHandler
+                 media_handler: IHandler
                  ):
         self._logger = logger
         self._media_handler = media_handler

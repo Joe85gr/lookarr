@@ -8,7 +8,7 @@ from src.domain.checkers.conversation_checker import check_conversation
 from src.domain.checkers.idefaults_checker import IDefaultValuesChecker
 from src.domain.checkers.search_checker import check_search_is_valid
 from src.domain.config.app_config import Config
-from src.domain.handlers.interfaces.imedia_handler import IMediaHandler
+from src.domain.handlers.interfaces.ihandler import IHandler
 from src.domain.handlers.messages_handler import MessagesHandler
 from src.domain.handlers.stop_handler import stop_handler
 from src.infrastructure.folder import Folder
@@ -19,7 +19,7 @@ from src.logger import ILogger
 
 
 @inject
-class MediaHandler(IMediaHandler):
+class Handler(IHandler):
     def __init__(
             self,
             media_server_factory: IMediaServerFactory,
