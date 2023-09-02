@@ -12,8 +12,8 @@ from src.domain.handlers.interfaces.imovie_handler import IMovieHandler
 from src.domain.handlers.movie_handler import MovieHandler
 from src.domain.handlers.series_handler import SeriesHandler
 from src.domain.handlers.interfaces.iseries_handler import ISeriesHandler
+from src.infrastructure.db.tinydb import TinyDb
 from src.infrastructure.interfaces.IDatabase import IDatabase
-from src.infrastructure.db.sqlite import Database
 from src.infrastructure.interfaces.imedia_server_factory import IMediaServerFactory
 from src.infrastructure.interfaces.imedia_server_repository import IMediaServerRepository
 from src.infrastructure.media_server_factory import MediaServerFactory
@@ -32,7 +32,7 @@ from src.infrastructure.sonarr.sonarr import Sonarr
 
 def configure_services() -> None:
     di[Config] = ConfigLoader().load_config(CONFIG_FULL_PATH)
-    di[IDatabase] = Database()
+    di[IDatabase] = TinyDb()
     di[IAuth] = Auth()
     di["client"] = requests
 
