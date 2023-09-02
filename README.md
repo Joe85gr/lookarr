@@ -39,6 +39,7 @@ Adding chat ids on the "strict_mode_allowed_ids" section within the config file 
 Rename config-sample.yml to config.yml and set it before running
 Requires python 3.10+
 
+
 ```bash
 export PYTHONPATH=.
 export TELEGRAM_BOT_KEY=YOUR_TELEGRAM_BOT_KEY 
