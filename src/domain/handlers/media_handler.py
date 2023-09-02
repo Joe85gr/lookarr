@@ -39,7 +39,7 @@ class MediaHandler(IMediaHandler):
             MessagesHandler.new_message(update, context, "Bro, all media servers are disabled in the config.. 🙄")
             return ConversationHandler.END
         elif self._config.active_media_servers == 1:
-            self._set_media_type(self._config.default_media_server, context)
+            context.user_data["type"] = self._config.default_media_server
             self.search_media(update, context)
         else:
             keyboard = Keyboard.search()
@@ -165,17 +165,12 @@ class MediaHandler(IMediaHandler):
         stop_handler.clear_user_data(update, context, False)
         return ConversationHandler.END
 
-    @staticmethod
-    def _set_media_type(media_type: str, context: CallbackContext):
-        context.user_data["type"] = media_type
-
     @check_user_is_authenticated
     @check_conversation(["reply"])
     def search_media(self, update: Update, context: CallbackContext) -> None | int:
         MessagesHandler.update_query_or_send_new(update, context, f"Looking for '{context.user_data['reply']}'..👀")
 
-        if "type" not in context.user_data:
-            self._set_media_type(update.callback_query.data, context)
+        context.user_data["type"] = update.callback_query.data
 
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
 

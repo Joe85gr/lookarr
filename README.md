@@ -44,3 +44,5 @@ export SONARR_API_KEY=YOUR_SONARR_API_KEY
 
 python ./src/main.py
 ```
+
+## Config
