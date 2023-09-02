@@ -78,6 +78,11 @@ class Handler(IHandler):
 
         folders = media_server.media_server.get_root_folders()
 
+        if len(folders) == 1:
+            context.user_data["path"] = folders[0]["path"]
+            default_folder_action(update, context)
+            return
+
         results = [from_dict(data_class=Folder, data=folder) for folder in folders]
 
         keyboard = Keyboard.folders(results, context.user_data["type"])
@@ -102,6 +107,11 @@ class Handler(IHandler):
         qualityProfiles = media_server.media_server.get_quality_profiles()
 
         results = [from_dict(data_class=QualityProfile, data=entry) for entry in qualityProfiles]
+
+        if len(results) == 1:
+            context.user_data["quality_profile"] = results[0].id
+            default_profile_action(update, context)
+            return
 
         keyboard = Keyboard.quality_profiles(results, context.user_data["type"])
 
