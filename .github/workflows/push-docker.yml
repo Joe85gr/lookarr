@@ -1,7 +1,7 @@
-name: _push
+name: push_docker
 
 on:
-  workflow_call:
+  workflow_dispatch:
 
 jobs:
 

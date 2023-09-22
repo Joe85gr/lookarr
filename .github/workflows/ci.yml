@@ -1,0 +1,11 @@
+name: ci
+
+on: [push]
+
+permissions:
+  contents: write
+
+jobs:
+
+  build:
+    uses: ./.github/workflows/_build.yml
