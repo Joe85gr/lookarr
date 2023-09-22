@@ -10,12 +10,12 @@ from urllib.parse import quote
 
 from src.infrastructure.media_server_repository import IMediaServerRepositoryBase
 from src.infrastructure.sonarr.series import Series
-from src.logger import ILogger
+from src.logger import Logger
 
 
 @inject
 class Sonarr(IMediaServerRepository):
-    def __init__(self, logger: ILogger, config: Config, client: requests, media_server: IMediaServerRepositoryBase):
+    def __init__(self, logger: Logger, config: Config, client: requests, media_server: IMediaServerRepositoryBase):
         self._config: MediaServerConfig = config.sonarr
         self._logger = logger
         self._requests = client

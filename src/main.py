@@ -3,6 +3,8 @@
 from os import environ, path, makedirs
 
 from kink import inject
+
+from src import Logger
 from src.dependencies.services import configure_services
 
 from src.domain.handlers.interfaces.iauthentication_handler import IAuthHandler
@@ -33,6 +35,7 @@ def initialise(db: IDatabase, config: Config) -> None:
 
 @inject
 def main(
+        logger: Logger,
         config: Config,
         authentication_handler: IAuthHandler,
         media_handler: IHandler,
@@ -41,6 +44,7 @@ def main(
         stop_handler: IStopHandler,
         help_handler: IHelpHandler
 ) -> None:
+    logger.info("Starting bot")
 
     updater = Updater(environ.get("TELEGRAM_BOT_KEY"))
 

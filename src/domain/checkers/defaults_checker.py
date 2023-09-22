@@ -1,4 +1,4 @@
-from src import ILogger
+from src import Logger
 from kink import inject
 from telegram.ext import CallbackContext
 
@@ -8,7 +8,7 @@ from src.infrastructure.media_server import MediaServer
 
 @inject
 class DefaultValuesChecker(IDefaultValuesChecker):
-    def __init__(self, logger: ILogger):
+    def __init__(self, logger: Logger):
         self._logger = logger
 
     def is_valid(self,
@@ -19,6 +19,7 @@ class DefaultValuesChecker(IDefaultValuesChecker):
                  media_server: MediaServer,
                  context: CallbackContext
                  ) -> bool:
+
         default_value = media_server.media_server.defaults[profile_name]
 
         if default_value:

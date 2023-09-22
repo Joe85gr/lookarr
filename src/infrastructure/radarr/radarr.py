@@ -8,12 +8,12 @@ from src.infrastructure.interfaces.imedia_server_repository import IMediaServerR
 from src.infrastructure.media_server_repository import IMediaServerRepositoryBase
 from src.infrastructure.radarr.movie import Movie
 from urllib.parse import quote
-from src.logger import ILogger
+from src.logger import Logger
 
 
 @inject
 class Radarr(IMediaServerRepository):
-    def __init__(self, logger: ILogger, config: Config, client: requests, media_server: IMediaServerRepositoryBase):
+    def __init__(self, logger: Logger, config: Config, client: requests, media_server: IMediaServerRepositoryBase):
         self._config = config.radarr
         self._logger = logger
         self._requests = client

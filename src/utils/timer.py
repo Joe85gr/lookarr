@@ -1,13 +1,13 @@
 from functools import wraps
-from time import time, sleep
+from time import time
 
-from src.logger import ILogger
+from src.logger import Logger
 from kink import inject
 
 
 @inject
 class Timer:
-    def __init__(self, logger: ILogger):
+    def __init__(self, logger: Logger):
         self._logger = logger
 
     def __call__(self, func):

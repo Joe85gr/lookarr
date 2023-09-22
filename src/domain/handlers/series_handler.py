@@ -8,13 +8,13 @@ from src.domain.checkers.conversation_checker import check_conversation
 from src.domain.handlers.messages_handler import MessagesHandler
 from src.domain.handlers.interfaces.ihandler import IHandler
 from src.interface.keyboard import Keyboard
-from src.logger import ILogger
+from src.logger import Logger
 
 
 @inject
 class SeriesHandler(ISeriesHandler):
     def __init__(self,
-                 logger: ILogger,
+                 logger: Logger,
                  media_handler: IHandler,
                  ):
         self._logger = logger
@@ -23,6 +23,8 @@ class SeriesHandler(ISeriesHandler):
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
     def get_folders(self, update: Update, context: CallbackContext):
+        MessagesHandler.delete_current_and_add_new(context, update, ".. 👀")
+
         default_folder_action = self.get_quality_profiles
         self._media_handler.get_folders(update, context, default_folder_action)
 

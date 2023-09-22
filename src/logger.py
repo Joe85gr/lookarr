@@ -1,42 +1,11 @@
 import logging
 import os
-from abc import ABC, abstractmethod
 from pathlib import Path
 
 from src.constants import LOG_FULL_PATH
 
 
-class ILogger(ABC):
-    @abstractmethod
-    def info(self, message: str) -> None:
-        """Logs an info message"""
-
-    @abstractmethod
-    def debug(self, message: str) -> None:
-        """Logs a debug message"""
-
-    @abstractmethod
-    def warning(self, message: str) -> None:
-        """Logs a warning message"""
-
-    @abstractmethod
-    def error(self, message: str, e: Exception = None) -> None:
-        """Logs an error message"""
-
-    @abstractmethod
-    def critical(self, message: str) -> None:
-        """Logs a critical message"""
-
-    @abstractmethod
-    def exception(self, message: str) -> None:
-        """Logs an exception message"""
-
-    @abstractmethod
-    def log(self, level: int, message: str) -> None:
-        """Logs a message at a given level"""
-
-
-class Logger(logging.Logger, ILogger):
+class Logger(logging.Logger):
     def __init__(self, name: str):
         super().__init__(name)
         super().setLevel(logging.INFO)

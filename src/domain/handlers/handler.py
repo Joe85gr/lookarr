@@ -15,7 +15,7 @@ from src.infrastructure.folder import Folder
 from src.infrastructure.interfaces.imedia_server_factory import IMediaServerFactory
 from src.infrastructure.quality_profiles import QualityProfile
 from src.interface.keyboard import Keyboard
-from src.logger import ILogger
+from src.logger import Logger
 
 
 @inject
@@ -23,7 +23,7 @@ class Handler(IHandler):
     def __init__(
             self,
             media_server_factory: IMediaServerFactory,
-            logger: ILogger,
+            logger: Logger,
             config: Config,
             defaults: IDefaultValuesChecker,
     ):
@@ -58,9 +58,7 @@ class Handler(IHandler):
 
         self.show_medias(update, context)
 
-    def get_folders(self, update: Update, context: CallbackContext, default_folder_action):
-        MessagesHandler.delete_current_and_add_new(context, update, ".. 👀")
-
+    def get_folders(self, update: Update, context: CallbackContext, default_is_valid_action):
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
         valid_values = media_server.media_server.get_root_folders()
         default_is_valid = self._defaults.is_valid(profile_name="path",
@@ -72,15 +70,14 @@ class Handler(IHandler):
                                                    )
 
         if default_is_valid:
-            context.user_data["path"] = media_server.media_server.defaults["path"]
-            default_folder_action(update, context)
+            default_is_valid_action(update, context)
             return
 
         folders = media_server.media_server.get_root_folders()
 
         if len(folders) == 1:
             context.user_data["path"] = folders[0]["path"]
-            default_folder_action(update, context)
+            default_is_valid_action(update, context)
             return
 
         results = [from_dict(data_class=Folder, data=folder) for folder in folders]
@@ -90,31 +87,29 @@ class Handler(IHandler):
 
     def get_quality_profiles(self, update: Update, context: CallbackContext, default_profile_action):
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
-
-        query = update.callback_query
-
-        if not "path" in context.user_data:
-            context.user_data["path"] = query.data.removeprefix(f"{context.user_data['type']}GetQualityProfiles: ")
-
         valid_values = media_server.media_server.get_quality_profiles()
-        has_default_profile = self._defaults.is_valid(
-            "quality_profile", "name", "id", valid_values, media_server, context)
+        default_is_valid = self._defaults.is_valid(profile_name="quality_profile",
+                                                   profile_name_identifier="name",
+                                                   profile_key_identifier="id",
+                                                   valid_values=valid_values,
+                                                   media_server=media_server,
+                                                   context=context
+                                                   )
 
-        if has_default_profile:
+        if default_is_valid:
             default_profile_action(update, context)
             return
 
-        qualityProfiles = media_server.media_server.get_quality_profiles()
+        quality_profiles = media_server.media_server.get_quality_profiles()
 
-        results = [from_dict(data_class=QualityProfile, data=entry) for entry in qualityProfiles]
-
-        if len(results) == 1:
-            context.user_data["quality_profile"] = results[0].id
+        if len(quality_profiles) == 1:
+            context.user_data["quality_profile"] = quality_profiles[0]["id"]
             default_profile_action(update, context)
             return
+
+        results = [from_dict(data_class=QualityProfile, data=entry) for entry in quality_profiles]
 
         keyboard = Keyboard.quality_profiles(results, context.user_data["type"])
-
         MessagesHandler.delete_current_and_add_new(context, update, "Select Quality Profile:", keyboard)
 
     @check_user_is_authenticated
