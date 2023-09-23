@@ -59,7 +59,9 @@ def main(
             CommandHandler("series", series_handler.search_media),
         ],
         states={
-            SEARCH_STARTED: [CallbackQueryHandler(media_handler.search_media, pattern="Sonarr|Radarr")],
+            SEARCH_STARTED: [
+                CallbackQueryHandler(media_handler.search_media, pattern="Sonarr|Radarr")
+            ],
             MEDIA_TYPE_SELECTED: [
                 CallbackQueryHandler(movie_handler.get_folders, pattern="RadarrGetFolders"),
                 CallbackQueryHandler(series_handler.get_folders, pattern="SonarrGetFolders"),
