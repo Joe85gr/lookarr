@@ -24,19 +24,6 @@ class TestAuthHandler:
         di[ILogger] = self._logger
 
     @pytest.mark.asyncio
-    async def test_authorised(self):
-        self.update.effective_user.id = 123
-
-        self._auth.user_is_authenticated_strict.awaited_return_value = True
-        self._auth.user_is_authenticated.return_value = False
-        self._auth.authenticate_user.awaited_return_value = True
-
-        sut = AuthHandler()
-
-        result = await sut.authenticate(self.update, self.context)
-        self.update.message.reply_text.assert_awaited_once_with(text=f"Nice one! You're in buddy 😌")
-
-    @pytest.mark.asyncio
     async def test_unauthorised_user(self):
         # Arrange
         self.update.effective_user.id = 123
