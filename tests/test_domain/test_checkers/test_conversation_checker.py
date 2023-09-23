@@ -14,7 +14,7 @@ class TestCheckConversation:
         self.update = AsyncMock(autospec=Update)
         self.context = AsyncMock(spec=CallbackContext)
         self.cls = AsyncMock()
-        self.func = MagicMock()
+        self.func = AsyncMock()
         stop_handler.lost_track_of_conversation = AsyncMock(return_value=False)
 
     @pytest.mark.asyncio
@@ -49,18 +49,19 @@ class TestCheckConversation:
 class TestAnswerQuery:
     @pytest.fixture(autouse=True)
     def setup_method(self):
-        self.update = MagicMock(autospec=Update)
+        self.update = AsyncMock(autospec=Update)
         self.context = MagicMock(spec=CallbackContext)
         self.cls = MagicMock()
-        self.func = MagicMock()
+        self.func = AsyncMock()
 
-    def test_answer_query_calls_func(self):
+    @pytest.mark.asyncio
+    async def test_answer_query_calls_func(self):
         # Arrange
         aq = answer_query()
         sut = aq(self.func)
 
         # Act
-        result = sut(self.cls, self.update, self.context)
+        result = await sut(self.cls, self.update, self.context)
 
         # Assert
         self.update.callback_query.answer.assert_called_once()

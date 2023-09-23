@@ -1,4 +1,5 @@
-from unittest.mock import MagicMock
+from logging import Logger
+from unittest.mock import MagicMock, AsyncMock
 import pytest
 from kink import di
 from telegram import Update
@@ -14,9 +15,10 @@ class TestAuthHandler:
     @pytest.fixture(autouse=True)
     def setup_method(self):
         self.update = MagicMock(autospec=Update)
-        self.context = MagicMock(spec=CallbackContext)
-        self._auth = MagicMock()
-        self._logger = MagicMock()
+        self.update.message.reply_text = AsyncMock()
+        self.context = AsyncMock(spec=CallbackContext)
+        self._auth = AsyncMock()
+        self._logger = MagicMock(spec=Logger)
 
         di[IAuth] = self._auth
         di[ILogger] = self._logger
@@ -33,7 +35,8 @@ class TestAuthHandler:
         sut.authenticate(self.update, self.context)
         self.update.message.reply_text.assert_called_once_with(text=f"Nice one! You're in buddy 😌")
 
-    def test_unauthorised_user(self):
+    @pytest.mark.asyncio
+    async def test_unauthorised_user(self):
         # Arrange
         self.update.effective_user.id = 123
         self._auth.user_is_authenticated_strict.return_value = False
@@ -41,7 +44,7 @@ class TestAuthHandler:
         sut = AuthHandler()
 
         # Act
-        result = sut.authenticate(self.update, self.context)
+        result = await sut.authenticate(self.update, self.context)
 
         # Assert
         self._logger.info.assert_called_with("unauthorised user 123. Won't reply :D")

@@ -1,5 +1,6 @@
+import pytest
 from kink import di
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch, AsyncMock
 
 from src.domain.checkers.idefaults_checker import IDefaultValuesChecker
 from tests.mockers.mock_decorators import mock_check_user_is_authenticated, mock_check_check_conversation
@@ -11,8 +12,9 @@ from src.domain.handlers.handler import Handler
 
 
 class Test_SearchHandler:
-    @patch.object(Handler, 'show_medias', MagicMock())
-    def test_option_change(self):
+    @patch.object(Handler, 'show_medias', AsyncMock())
+    @pytest.mark.asyncio
+    async def test_option_change(self):
         # Arrange
         di[IDefaultValuesChecker] = Mock()
         update = Mock()
@@ -31,7 +33,7 @@ class Test_SearchHandler:
             sut = Handler(Mock())
 
             # Act
-            sut.change_option(update, context)
+            await sut.change_option(update, context)
 
             # Assert
             assert context.user_data["position"] == test_case["expected_result"]

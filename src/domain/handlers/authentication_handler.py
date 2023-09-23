@@ -16,14 +16,13 @@ class AuthHandler(IAuthHandler):
         self._config = config
         self._auth = auth
 
-    async def authenticate(self, update: Update, context: CallbackContext) -> None | int:
+    async def authenticate(self, update: Update, context: CallbackContext) -> int:
         user = update.effective_user
 
         user_reply = UserReply(update.message.text)
 
         if not self._auth.user_is_authenticated_strict(user.id):
             self._logger.info(f"unauthorised user {user.id}. Won't reply :D")
-            return ConversationHandler.END
         elif self._auth.user_is_authenticated(user.id):
             await update.message.reply_text(
                 text="What you want?? You're already authenticated! Do you like passwords or something 🤣")
@@ -34,3 +33,6 @@ class AuthHandler(IAuthHandler):
         else:
             await update.message.delete()
             await update.message.reply_text(text=f"Nice one! You're in buddy 😌")
+
+        return ConversationHandler.END
+
