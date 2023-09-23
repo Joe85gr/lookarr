@@ -1,9 +1,9 @@
 from abc import ABC
 
 from telegram import Update
-from telegram.ext import CallbackContext
+from telegram.ext import ContextTypes
 
 
 class IAuthHandler(ABC):
-    def authenticate(self, update: Update, context: CallbackContext) -> None | int:
+    async def authenticate(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         """Authenticate user"""

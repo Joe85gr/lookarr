@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 
 from telegram import Update
-from telegram.ext import CallbackContext
+from telegram.ext import ContextTypes
 
 
 class IHelpHandler(ABC):
     @staticmethod
     @abstractmethod
-    def help(update: Update, context: CallbackContext) -> None:
+    async def help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         """Show help message"""

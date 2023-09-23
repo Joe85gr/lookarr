@@ -1,14 +1,18 @@
 #!/usr/bin/env python
-
-from os import environ, path, makedirs
-
+import os
+from os import path, makedirs
 from kink import inject
+from telegram import Update
+from datetime import timedelta
+
+from src.constants import MEDIA_SELECTED, QUALITY_SELECTED, SEASON_SELECTION, \
+    DELETE_CONFIRMED, SEARCH_STARTED, MEDIA_TYPE_SELECTED
 from src.dependencies.services import configure_services
 
 from src.domain.handlers.interfaces.iauthentication_handler import IAuthHandler
 from src.domain.handlers.interfaces.ihandler import IHandler
 
-from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
+from telegram.ext import CommandHandler, CallbackQueryHandler, Application, ConversationHandler
 from src.domain.config.app_config import Config
 from src.domain.handlers.interfaces.ihelp_handler import IHelpHandler
 from src.domain.handlers.interfaces.imovie_handler import IMovieHandler
@@ -41,34 +45,52 @@ def main(
         stop_handler: IStopHandler,
         help_handler: IHelpHandler
 ) -> None:
+    application = Application.builder().token(os.getenv("TELEGRAM_BOT_KEY")).build()
 
-    updater = Updater(environ.get("TELEGRAM_BOT_KEY"))
-
-    updater.dispatcher.add_handler(CommandHandler(config.lookarr.search_all_command, media_handler.start_search))
-    updater.dispatcher.add_handler(CallbackQueryHandler(movie_handler.add_to_library, pattern="RadarrQuality"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(series_handler.set_quality, pattern="SonarrQuality"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(series_handler.add_to_library, pattern="AddSeries"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(movie_handler.get_folders, pattern="RadarrGetFolders"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(series_handler.get_folders, pattern="SonarrGetFolders"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(movie_handler.get_quality_profiles,
-                                                        pattern="RadarrGetQualityProfiles"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(series_handler.get_quality_profiles,
-                                                        pattern="SonarrGetQualityProfiles"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(series_handler.select_season, pattern="SelectSeason"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(media_handler.confirm_delete,
-                                                        pattern="ConfirmDelete"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(media_handler.change_option,
-                                                        pattern="Next|Previous"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(media_handler.delete, pattern="Delete"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(stop_handler.stop, pattern="Stop"))
-    updater.dispatcher.add_handler(CommandHandler('help', help_handler.help))
-    updater.dispatcher.add_handler(CommandHandler('auth', authentication_handler.authenticate))
-    updater.dispatcher.add_handler(CallbackQueryHandler(media_handler.search_media, pattern="Sonarr|Radarr"))
+    conversation_handler = ConversationHandler(
+        conversation_timeout=timedelta(minutes=15),
+        per_user=True,
+        allow_reentry=True,
+        entry_points=[
+            CommandHandler(config.lookarr.search_all_command, media_handler.start_search),
+            CommandHandler('help', help_handler.help),
+            CommandHandler('auth', authentication_handler.authenticate),
+            CommandHandler("movie", movie_handler.search_media),
+            CommandHandler("series", series_handler.search_media),
+        ],
+        states={
+            SEARCH_STARTED: [
+                CallbackQueryHandler(media_handler.search_media, pattern="Sonarr|Radarr")
+            ],
+            MEDIA_TYPE_SELECTED: [
+                CallbackQueryHandler(movie_handler.get_folders, pattern="RadarrGetFolders"),
+                CallbackQueryHandler(series_handler.get_folders, pattern="SonarrGetFolders"),
+                CallbackQueryHandler(media_handler.change_option, pattern="Next|Previous"),
+                CallbackQueryHandler(media_handler.confirm_delete, pattern="ConfirmDelete")
+            ],
+            MEDIA_SELECTED: [
+                CallbackQueryHandler(movie_handler.get_quality_profiles, pattern="RadarrGetQualityProfiles"),
+                CallbackQueryHandler(series_handler.get_quality_profiles, pattern="SonarrGetQualityProfiles"),
+            ],
+            QUALITY_SELECTED: [
+                CallbackQueryHandler(movie_handler.add_to_library, pattern="RadarrQuality"),
+                CallbackQueryHandler(series_handler.set_quality, pattern="SonarrQuality")
+            ],
+            SEASON_SELECTION: [
+                CallbackQueryHandler(series_handler.add_to_library, pattern="AddSeries"),
+                CallbackQueryHandler(series_handler.select_season, pattern="SelectSeason")
+            ],
+            DELETE_CONFIRMED: [CallbackQueryHandler(media_handler.delete, pattern="Delete")],
+        },
+        fallbacks=[
+            CallbackQueryHandler(stop_handler.stop, pattern="Stop")
+        ],
+    )
 
     # Start bot
-    updater.start_polling()
+    application.add_handler(conversation_handler)
 
-    updater.idle()
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
 if __name__ == '__main__':

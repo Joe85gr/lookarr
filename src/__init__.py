@@ -1,4 +1,7 @@
 from kink import di
-from src.logger import ILogger, Logger
+from src.logger import Logger
+from warnings import filterwarnings
+from telegram.warnings import PTBUserWarning
 
-di[ILogger] = Logger(__name__)
+filterwarnings(action="ignore", message=r".*CallbackQueryHandler", category=PTBUserWarning)
+di[Logger] = Logger(__name__)

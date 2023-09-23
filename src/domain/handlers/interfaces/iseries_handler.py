@@ -10,9 +10,9 @@ class ISeriesHandler(IMediaHandler, ABC):
     """Series handler interface"""
 
     @abstractmethod
-    def set_quality(self, update: Update, context: CallbackContext):
+    async def set_quality(self, update: Update, context: CallbackContext):
         """Set quality"""
 
     @abstractmethod
-    def select_season(self, update: Update, context: CallbackContext):
+    async def select_season(self, update: Update, context: CallbackContext):
         """Select season"""

@@ -144,19 +144,25 @@ VALID_RESPONSE = [
     "sortTitle": "boruto naruto movie",
     "sizeOnDisk": 0,
     "status": "released",
-    "overview": "The spirited Boruto Uzumaki, son of Seventh Hokage Naruto, is a skilled ninja who possesses the same brashness and passion his father once had. However, the constant absence of his father, who is busy with his Hokage duties, puts a damper on Boruto's fire. He ends up meeting his father's friend Sasuke, and requests to become... his apprentice!? The curtain on the story of the new generation rises!",
+    "overview": "The spirited Boruto Uzumaki, son of Seventh Hokage Naruto, is a skilled ninja who possesses the same "
+                "brashness and passion his father once had. However, the constant absence of his father, who is busy "
+                "with his Hokage duties, puts a damper on Boruto's fire. He ends up meeting his father's friend "
+                "Sasuke, and requests to become... his apprentice!? The curtain on the story of the new generation "
+                "rises!",
     "inCinemas": "2015-08-07T00:00:00Z",
     "physicalRelease": "2016-11-09T00:00:00Z",
     "digitalRelease": "2015-04-20T00:00:00Z",
     "images": [
       {
         "coverType": "poster",
-        "query": "/MediaCoverProxy/3839e6717635f23f84aa2252e424514b1a9adf4b56d867c4ba35cdc457c9439c/1k6iwC4KaPvTBt1JuaqXy3noZRY.jpg",
+        "query": "/MediaCoverProxy/3839e6717635f23f84aa2252e424514b1a9adf4b56d867c4ba35cdc457c9439c"
+                 "/1k6iwC4KaPvTBt1JuaqXy3noZRY.jpg",
         "remoteUrl": "https://image.tmdb.org/t/p/original/1k6iwC4KaPvTBt1JuaqXy3noZRY.jpg"
       },
       {
         "coverType": "fanart",
-        "query": "/MediaCoverProxy/456370602c8fca01fc8ad12751eec2dcf7e00403a4d167a2325ca5a1a30dcae8/8kQtBcax6zqiwFhDRS2mmPvLf8.jpg",
+        "query": "/MediaCoverProxy/456370602c8fca01fc8ad12751eec2dcf7e00403a4d167a2325ca5a1a30dcae8"
+                 "/8kQtBcax6zqiwFhDRS2mmPvLf8.jpg",
         "remoteUrl": "https://image.tmdb.org/t/p/original/8kQtBcax6zqiwFhDRS2mmPvLf8.jpg"
       }
     ],
