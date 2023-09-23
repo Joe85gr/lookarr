@@ -47,7 +47,7 @@ def main(
 ) -> None:
     application = Application.builder().token(os.getenv("TELEGRAM_BOT_KEY")).build()
 
-    conv_handler = ConversationHandler(
+    conversation_handler = ConversationHandler(
         conversation_timeout=timedelta(minutes=15),
         per_user=True,
         allow_reentry=True,
@@ -86,7 +86,7 @@ def main(
     )
 
     # Start bot
-    application.add_handler(conv_handler)
+    application.add_handler(conversation_handler)
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
