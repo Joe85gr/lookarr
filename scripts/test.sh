@@ -1,5 +1,5 @@
 python -m pip install --upgrade pip
-pip install pytest-cov, pytest, requests-mock, pytest-asyncio
+pip install pytest-cov pytest requests-mock pytest-asyncio
 
 if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
