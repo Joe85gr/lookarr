@@ -17,23 +17,24 @@ class TestAuthHandler:
         self.update = MagicMock(autospec=Update)
         self.update.message.reply_text = AsyncMock()
         self.context = AsyncMock(spec=CallbackContext)
-        self._auth = AsyncMock()
+        self._auth = MagicMock()
         self._logger = MagicMock(spec=Logger)
 
         di[IAuth] = self._auth
         di[ILogger] = self._logger
 
-    def authorised(self):
+    @pytest.mark.asyncio
+    async def test_authorised(self):
         self.update.effective_user.id = 123
 
-        self._auth.user_is_authenticated_strict.return_value = True
+        self._auth.user_is_authenticated_strict.awaited_return_value = True
         self._auth.user_is_authenticated.return_value = False
-        self._auth.authenticate_user.return_value = True
+        self._auth.authenticate_user.awaited_return_value = True
 
         sut = AuthHandler()
 
-        sut.authenticate(self.update, self.context)
-        self.update.message.reply_text.assert_called_once_with(text=f"Nice one! You're in buddy 😌")
+        result = await sut.authenticate(self.update, self.context)
+        self.update.message.reply_text.assert_awaited_once_with(text=f"Nice one! You're in buddy 😌")
 
     @pytest.mark.asyncio
     async def test_unauthorised_user(self):
@@ -50,7 +51,8 @@ class TestAuthHandler:
         self._logger.info.assert_called_with("unauthorised user 123. Won't reply :D")
         assert result == ConversationHandler.END
 
-    def test_already_authenticated_user(self):
+    @pytest.mark.asyncio
+    async def test_already_authenticated_user(self):
         self.update.effective_user.id = 123
 
         self._auth.user_is_authenticated_strict.return_value = True
@@ -58,11 +60,12 @@ class TestAuthHandler:
 
         sut = AuthHandler()
 
-        sut.authenticate(self.update, self.context)
-        self.update.message.reply_text.assert_called_once_with(
+        await sut.authenticate(self.update, self.context)
+        self.update.message.reply_text.assert_awaited_once_with(
             text="What you want?? You're already authenticated! Do you like passwords or something 🤣")
 
-    def test_invalid_user_reply(self):
+    @pytest.mark.asyncio
+    async def test_invalid_user_reply(self):
         self.update.effective_user.id = 123
         self.update.message.text = "invalid"
 
@@ -71,11 +74,12 @@ class TestAuthHandler:
 
         sut = AuthHandler()
 
-        sut.authenticate(self.update, self.context)
-        self.update.message.reply_text.assert_called_once_with(
+        await sut.authenticate(self.update, self.context)
+        self.update.message.reply_text.assert_awaited_once_with(
             text="You need to write /auth <password> 😒 don't make me repeat myself..")
 
-    def test_wrong_password(self):
+    @pytest.mark.asyncio
+    async def test_wrong_password(self):
         self.update.effective_user.id = 123
 
         self._auth.user_is_authenticated_strict.return_value = True
@@ -84,6 +88,6 @@ class TestAuthHandler:
 
         sut = AuthHandler()
 
-        sut.authenticate(self.update, self.context)
-        self.update.message.reply_text.assert_called_once_with(
+        await sut.authenticate(self.update, self.context)
+        self.update.message.reply_text.assert_awaited_once_with(
             text=f"Sorry pal, wrong password 😝 try again.")
