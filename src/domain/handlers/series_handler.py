@@ -2,8 +2,9 @@ from telegram import Update
 from telegram.ext import CallbackContext
 from kink import inject
 
-from src.constants import MEDIA_SELECTED, SEASON_SELECTED
+from src.constants import MEDIA_SELECTED, SEASON_SELECTION
 from src.domain.checkers.authentication_checker import check_user_is_authenticated
+from src.domain.checkers.search_checker import check_search_is_valid
 from src.domain.handlers.interfaces.iseries_handler import ISeriesHandler
 from src.domain.checkers.conversation_checker import check_conversation
 from src.domain.handlers.messages_handler import MessagesHandler
@@ -22,8 +23,14 @@ class SeriesHandler(ISeriesHandler):
         self._media_handler = media_handler
 
     @check_user_is_authenticated
+    @check_search_is_valid()
+    async def search_media(self, update: Update, context: CallbackContext) -> int:
+        context.user_data["type"] = "Sonarr"
+        return await self._media_handler.search_media(update, context)
+
+    @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
-    async def get_folders(self, update: Update, context: CallbackContext):
+    async def get_folders(self, update: Update, context: CallbackContext) -> int:
         default_folder_action = self.get_quality_profiles
         await self._media_handler.get_folders(update, context, default_folder_action)
 
@@ -31,13 +38,13 @@ class SeriesHandler(ISeriesHandler):
 
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
-    async def get_quality_profiles(self, update: Update, context: CallbackContext):
+    async def get_quality_profiles(self, update: Update, context: CallbackContext) -> int:
         default_profile_action = self.select_season
         return await self._media_handler.get_quality_profiles(update, context, default_profile_action)
 
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
-    async def set_quality(self, update: Update, context: CallbackContext):
+    async def set_quality(self, update: Update, context: CallbackContext) -> int:
         query = update.callback_query
 
         if not context.user_data.get("quality_profile"):
@@ -47,7 +54,7 @@ class SeriesHandler(ISeriesHandler):
 
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
-    async def select_season(self, update: Update, context: CallbackContext):
+    async def select_season(self, update: Update, context: CallbackContext) -> int:
         await MessagesHandler.delete_current_and_add_new(context, update, ".. 👀")
 
         query = update.callback_query
@@ -65,11 +72,11 @@ class SeriesHandler(ISeriesHandler):
 
         await MessagesHandler.delete_current_and_add_new(context, update, "Select Season:", keyboard)
 
-        return SEASON_SELECTED
+        return SEASON_SELECTION
 
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
-    async def add_to_library(self, update: Update, context: CallbackContext):
+    async def add_to_library(self, update: Update, context: CallbackContext) -> int:
         return await self._media_handler.add_to_library(update, context)
 
     @staticmethod

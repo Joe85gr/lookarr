@@ -8,17 +8,17 @@ from src.logger import ILogger
 
 def check_user_is_authenticated(func):
     @inject
-    def wrapper(cls, update: Update, context: CallbackContext, auth: IAuth, logger: ILogger) -> object:
+    async def wrapper(cls, update: Update, context: CallbackContext, auth: IAuth, logger: ILogger) -> object:
         user = update.effective_user
 
         if not auth.user_is_authenticated_strict(user.id):
             logger.info(f"unauthorised user {user.id}")
             return ConversationHandler.END
         elif not auth.user_is_authenticated(user.id):
-            update.message.reply_text(
-                "Well, shit! 😄 seems you're not authenticated! Write /auth <password> to authenticate!")
+            await update.message.reply_text("Well, shit! 😄 seems you're not authenticated! "
+                                            "Write /auth <password> to authenticate!")
             return ConversationHandler.END
 
-        return func(cls, update, context)
+        return await func(cls, update, context)
 
     return wrapper

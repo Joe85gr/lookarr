@@ -5,16 +5,14 @@ from kink import inject
 from telegram import Update
 from datetime import timedelta
 
-from src import ILogger
-from src.constants import MEDIA_SELECTED, QUALITY_SELECTED, ADD_SERIES, \
-    SEASON_SELECTED, SONARR_GET_QUALITY_PROFILES, SEASON_SELECTION, CONFIRM_DELETE, DELETE, SEARCH_STARTED, MEDIA_TYPE_SELECTED
+from src.constants import MEDIA_SELECTED, QUALITY_SELECTED, SEASON_SELECTION, \
+    DELETE_CONFIRMED, SEARCH_STARTED, MEDIA_TYPE_SELECTED
 from src.dependencies.services import configure_services
 
 from src.domain.handlers.interfaces.iauthentication_handler import IAuthHandler
 from src.domain.handlers.interfaces.ihandler import IHandler
 
-from telegram.ext import CommandHandler, CallbackQueryHandler, Application, ConversationHandler, ContextTypes, \
-    MessageHandler, filters
+from telegram.ext import CommandHandler, CallbackQueryHandler, Application, ConversationHandler
 from src.domain.config.app_config import Config
 from src.domain.handlers.interfaces.ihelp_handler import IHelpHandler
 from src.domain.handlers.interfaces.imovie_handler import IMovieHandler
@@ -38,12 +36,6 @@ def initialise(db: IDatabase, config: Config) -> None:
 
 
 @inject
-async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE, logger: ILogger,) -> None:
-    """Log the error and send a telegram message to notify the developer."""
-    logger.error("Exception while handling an update:", context.error)
-
-
-@inject
 def main(
         config: Config,
         authentication_handler: IAuthHandler,
@@ -63,7 +55,8 @@ def main(
             CommandHandler(config.lookarr.search_all_command, media_handler.start_search),
             CommandHandler('help', help_handler.help),
             CommandHandler('auth', authentication_handler.authenticate),
-            CommandHandler(["Sonarr", "Radarr"], media_handler.search_media),
+            CommandHandler("movie", movie_handler.search_media),
+            CommandHandler("series", series_handler.search_media),
         ],
         states={
             SEARCH_STARTED: [CallbackQueryHandler(media_handler.search_media, pattern="Sonarr|Radarr")],
@@ -82,22 +75,17 @@ def main(
                 CallbackQueryHandler(series_handler.set_quality, pattern="SonarrQuality")
             ],
             SEASON_SELECTION: [
-                CallbackQueryHandler(series_handler.select_season, pattern="SelectSeason")
-            ],
-            SEASON_SELECTED: [
                 CallbackQueryHandler(series_handler.add_to_library, pattern="AddSeries"),
                 CallbackQueryHandler(series_handler.select_season, pattern="SelectSeason")
             ],
-            DELETE: [CallbackQueryHandler(media_handler.delete, pattern="Delete")],
+            DELETE_CONFIRMED: [CallbackQueryHandler(media_handler.delete, pattern="Delete")],
         },
         fallbacks=[
-            CallbackQueryHandler(stop_handler.stop, pattern="Stop"),
-            MessageHandler(filters.Regex("Stop"), stop_handler.stop),
+            CallbackQueryHandler(stop_handler.stop, pattern="Stop")
         ],
     )
 
     # Start bot
-    application.add_error_handler(error_handler)
     application.add_handler(conv_handler)
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)

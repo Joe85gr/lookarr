@@ -3,7 +3,7 @@ from dacite import from_dict
 from telegram.ext import CallbackContext, ConversationHandler, ContextTypes
 from kink import inject
 
-from src.constants import SEARCH_STARTED, MEDIA_TYPE_SELECTED, DELETE, QUALITY_SELECTED
+from src.constants import SEARCH_STARTED, MEDIA_TYPE_SELECTED, DELETE_CONFIRMED, QUALITY_SELECTED
 from src.domain.checkers.authentication_checker import check_user_is_authenticated
 from src.domain.checkers.conversation_checker import check_conversation
 from src.domain.checkers.idefaults_checker import IDefaultValuesChecker
@@ -56,7 +56,8 @@ class Handler(IHandler):
             context,
             f"Looking for '{context.user_data['reply']}'..👀")
 
-        context.user_data["type"] = update.callback_query.data
+        if not "type" in context.user_data:
+            context.user_data["type"] = update.callback_query.data
 
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
 
@@ -65,7 +66,7 @@ class Handler(IHandler):
         if not results:
             await MessagesHandler.update_query_or_send_new(update, context, f"Sorry, I couldn't fine any result for "
                                                                             f"'{context.user_data['reply']}' 😔")
-            stop_handler.clear_user_data(update, context, False)
+            await stop_handler.clear_user_data(update, context, False)
             return ConversationHandler.END
 
         context.user_data["position"] = 0
@@ -136,7 +137,7 @@ class Handler(IHandler):
 
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
-    async def add_to_library(self, update: Update, context: CallbackContext):
+    async def add_to_library(self, update: Update, context: CallbackContext) -> int:
         await MessagesHandler.delete_current_and_add_new(context, update, ".. 👀")
 
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
@@ -153,12 +154,12 @@ class Handler(IHandler):
 
         await MessagesHandler.delete_current_and_add_new(context, update, message)
 
-        stop_handler.clear_user_data(update, context)
+        await stop_handler.clear_user_data(update, context)
         return ConversationHandler.END
 
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
-    async def confirm_delete(self, update: Update, context: CallbackContext):
+    async def confirm_delete(self, update: Update, context: CallbackContext) -> int:
         await MessagesHandler.delete_current_and_add_new(context, update, ".. 👀")
 
         position = context.user_data["position"]
@@ -169,11 +170,11 @@ class Handler(IHandler):
 
         await MessagesHandler.delete_current_and_add_new(context, update, message, keyboard)
 
-        return DELETE
+        return DELETE_CONFIRMED
 
     @check_user_is_authenticated
     @check_conversation(["update_msg", "type"])
-    async def delete(self, update: Update, context: CallbackContext):
+    async def delete(self, update: Update, context: CallbackContext) -> int:
         await MessagesHandler.delete_current_and_add_new(context, update, ".. 👀")
 
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
@@ -191,11 +192,11 @@ class Handler(IHandler):
 
         await MessagesHandler.delete_current_and_add_new(context, update, message)
 
-        stop_handler.clear_user_data(update, context, False)
+        await stop_handler.clear_user_data(update, context, False)
         return ConversationHandler.END
 
     @check_user_is_authenticated
-    async def show_medias(self, update: Update, context: CallbackContext):
+    async def show_medias(self, update: Update, context: CallbackContext) -> int:
         position = context.user_data["position"]
 
         media_server = self._media_server_factory.get_media_server(context.user_data["type"])
