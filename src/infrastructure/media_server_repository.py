@@ -9,7 +9,7 @@ import requests
 
 from src.infrastructure.api_query import ApiConfig
 from src.infrastructure.media_type import TMediaType
-from src.logger import ILogger
+from src.logger import Logger
 
 
 class IMediaServerRepositoryBase(ABC):
@@ -49,7 +49,7 @@ class IMediaServerRepositoryBase(ABC):
 
 @inject
 class MediaServer(IMediaServerRepositoryBase):
-    def __init__(self, logger: ILogger, client: requests):
+    def __init__(self, logger: Logger, client: requests):
         self._logger = logger
         self._requests = client
 

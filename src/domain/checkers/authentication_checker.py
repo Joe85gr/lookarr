@@ -3,12 +3,12 @@ from telegram.ext import CallbackContext, ConversationHandler
 from kink import inject
 
 from src.domain.auth.interfaces.iauthentication import IAuth
-from src.logger import ILogger
+from src.logger import Logger
 
 
 def check_user_is_authenticated(func):
     @inject
-    async def wrapper(cls, update: Update, context: CallbackContext, auth: IAuth, logger: ILogger) -> object:
+    async def wrapper(cls, update: Update, context: CallbackContext, auth: IAuth, logger: Logger) -> object:
         user = update.effective_user
 
         if not auth.user_is_authenticated_strict(user.id):

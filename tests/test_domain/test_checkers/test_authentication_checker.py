@@ -5,7 +5,7 @@ from telegram import User
 from telegram.ext import ConversationHandler
 from src.domain.auth.interfaces.iauthentication import IAuth
 from src.domain.checkers.authentication_checker import check_user_is_authenticated
-from src.logger import ILogger
+from src.logger import Logger
 
 
 class TestCheckUserIsAuthenticated:
@@ -19,7 +19,7 @@ class TestCheckUserIsAuthenticated:
         self._mock_logger = MagicMock()
 
         di[IAuth] = self._mock_auth
-        di[ILogger] = self._mock_logger
+        di[Logger] = self._mock_logger
 
     @pytest.mark.asyncio
     async def test_unauthorised_user(self):

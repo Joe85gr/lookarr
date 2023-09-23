@@ -1,13 +1,13 @@
 from yaml import safe_load
 from kink import inject
 
-from src import ILogger
+from src import Logger
 from src.domain.config.app_config import Config
 
 
 @inject
 class ConfigLoader:
-    def __init__(self, logger: ILogger):
+    def __init__(self, logger: Logger):
         self._logger = logger
 
     def load_config(self, config_full_path: str) -> Config:

@@ -6,12 +6,12 @@ from src.domain.auth.interfaces.iauthentication import IAuth
 from src.domain.config.app_config import Config
 from src.domain.handlers.interfaces.iauthentication_handler import IAuthHandler
 from src.domain.user import UserReply
-from src.logger import ILogger
+from src.logger import Logger
 
 
 @inject
 class AuthHandler(IAuthHandler):
-    def __init__(self, auth: IAuth, logger: ILogger, config: Config):
+    def __init__(self, auth: IAuth, logger: Logger, config: Config):
         self._logger = logger
         self._config = config
         self._auth = auth

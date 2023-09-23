@@ -8,13 +8,13 @@ from src.domain.checkers.conversation_checker import check_conversation
 from src.domain.checkers.search_checker import check_search_is_valid
 from src.domain.handlers.interfaces.imovie_handler import IMovieHandler
 from src.domain.handlers.interfaces.ihandler import IHandler
-from src.logger import ILogger
+from src.logger import Logger
 
 
 @inject
 class MovieHandler(IMovieHandler):
     def __init__(self,
-                 logger: ILogger,
+                 logger: Logger,
                  media_handler: IHandler
                  ):
         self._logger = logger

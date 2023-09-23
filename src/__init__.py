@@ -1,4 +1,4 @@
 from kink import di
-from src.logger import ILogger, Logger
+from src.logger import Logger
 
-di[ILogger] = Logger(__name__)
+di[Logger] = Logger(__name__)

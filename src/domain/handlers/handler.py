@@ -16,7 +16,7 @@ from src.infrastructure.folder import Folder
 from src.infrastructure.interfaces.imedia_server_factory import IMediaServerFactory
 from src.infrastructure.quality_profiles import QualityProfile
 from src.interface.keyboard import Keyboard
-from src.logger import ILogger
+from src.logger import Logger
 
 
 @inject
@@ -24,7 +24,7 @@ class Handler(IHandler):
     def __init__(
             self,
             media_server_factory: IMediaServerFactory,
-            logger: ILogger,
+            logger: Logger,
             config: Config,
             defaults: IDefaultValuesChecker,
     ):

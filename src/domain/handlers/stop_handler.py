@@ -4,12 +4,12 @@ from telegram.error import BadRequest
 from kink import inject
 
 from src.domain.checkers.authentication_checker import check_user_is_authenticated
-from src.logger import ILogger
+from src.logger import Logger
 
 
 @inject
 class StopHandler:
-    def __init__(self, logger: ILogger):
+    def __init__(self, logger: Logger):
         self._logger = logger
 
     @check_user_is_authenticated

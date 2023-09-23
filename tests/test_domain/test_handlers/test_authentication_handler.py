@@ -5,7 +5,7 @@ from kink import di
 from telegram import Update
 from telegram.ext import CallbackContext, ConversationHandler
 
-from src import ILogger
+from src import Logger
 from src.domain.auth.interfaces.iauthentication import IAuth
 from src.domain.handlers.authentication_handler import AuthHandler
 
@@ -22,7 +22,7 @@ class TestAuthHandler:
         self._logger = MagicMock(spec=Logger)
 
         di[IAuth] = self._auth
-        di[ILogger] = self._logger
+        di[Logger] = self._logger
 
     @pytest.mark.asyncio
     async def test_authorised(self):
