@@ -1,11 +1,11 @@
 from abc import ABC
 
 from telegram import Update
-from telegram.ext import CallbackContext
+from telegram.ext import CallbackContext, ContextTypes
 
 
 class IStopHandler(ABC):
-    def stop(self, update: Update, context: CallbackContext) -> None | int:
+    async def stop(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         """Stop the current conversation"""
 
     def clear_user_data(self, update: Update, context: CallbackContext, delete_last_message=True):

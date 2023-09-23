@@ -1,5 +1,5 @@
 from telegram import Update
-from telegram.ext import CallbackContext, ConversationHandler
+from telegram.ext import CallbackContext, ConversationHandler, ContextTypes
 from telegram.error import BadRequest
 from kink import inject
 
@@ -13,21 +13,21 @@ class StopHandler:
         self._logger = logger
 
     @check_user_is_authenticated
-    def stop(self, update, context):
-        update.callback_query.answer()
+    async def stop(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+        await update.callback_query.answer()
 
-        self.clear_user_data(update, context)
+        await self.clear_user_data(update, context)
 
-        context.bot.send_message(chat_id=update.effective_message.chat_id, text="Ok, nothing to do for me then 🌝")
+        await context.bot.send_message(chat_id=update.effective_message.chat_id, text="Ok, nothing to do for me then 🌝")
 
         return ConversationHandler.END
 
-    def clear_user_data(self, update: Update, context: CallbackContext, delete_last_message=True):
+    async def clear_user_data(self, update: Update, context: CallbackContext, delete_last_message=True):
         msg = update.effective_message
 
         if delete_last_message:
             try:
-                context.bot.delete_message(chat_id=update.effective_message.chat_id, message_id=msg.message_id)
+                await context.bot.delete_message(chat_id=update.effective_message.chat_id, message_id=msg.message_id)
             except BadRequest as e:
                 if not e.message.startswith("Message to delete not found"):
                     self._logger.error(f"could not delete message id {msg.message_id}", e)
