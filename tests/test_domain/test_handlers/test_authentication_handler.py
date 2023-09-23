@@ -66,7 +66,7 @@ class TestAuthHandler:
 
         sut = AuthHandler()
 
-        result = await sut.authenticate(self.update, self.context)
+        await sut.authenticate(self.update, self.context)
         self.update.message.reply_text.assert_awaited_once_with(
             text="What you want?? You're already authenticated! Do you like passwords or something 🤣")
 
