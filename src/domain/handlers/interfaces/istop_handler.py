@@ -11,5 +11,10 @@ class IStopHandler(ABC):
     async def clear_user_data(self, update: Update, context: CallbackContext, delete_last_message=True):
         """Clear the user data"""
 
-    async def lost_track_of_conversation(self, update: Update, context: CallbackContext, required_keys: list[str]) -> bool:
+    async def lost_track_of_conversation(
+            self,
+            update: Update,
+            context: CallbackContext,
+            required_keys: list[str]
+    ) -> bool:
         """Check if bot has lost track of conversation"""

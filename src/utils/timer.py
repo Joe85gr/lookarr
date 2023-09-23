@@ -1,5 +1,5 @@
 from functools import wraps
-from time import time, sleep
+from time import time
 
 from src.logger import ILogger
 from kink import inject

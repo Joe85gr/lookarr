@@ -1,5 +1,3 @@
-# .coveragerc to control pytest coverage
-
 [run]
 branch = True
 omit = *__init__.py, src/logger.py, src/infrastructure/sqlite.py, src/infrastructure/IDatabase.py

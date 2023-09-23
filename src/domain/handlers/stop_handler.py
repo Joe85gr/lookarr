@@ -35,7 +35,12 @@ class StopHandler:
         items = [item for item in context.user_data]
         [context.user_data.pop(item) for item in items]
 
-    async def lost_track_of_conversation(self, update: Update, context: CallbackContext, required_keys: list[str]) -> bool:
+    async def lost_track_of_conversation(
+            self,
+            update: Update,
+            context: CallbackContext,
+            required_keys: list[str]
+    ) -> bool:
         for key in required_keys:
             if not key in context.user_data:
                 await self._send_lost_track_message(update, context)

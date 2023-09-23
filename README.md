@@ -8,15 +8,13 @@ Telegram bot for managing Sonarr and Radarr.
 ## Overview
 <div>
     <img src="./imgs/banner_add.jpg" width="450" height="588">
-<div>
-</br>
+</div>
 <div>
     <img src="./imgs/banner_in_library.jpg" width="450" height="697">
-<div>
-</br>
+</div>
 <div>
     <img src="./imgs/banner_not_ready.jpg" width="450" height="656">
-<div>
+</div>
 
 ## How to run with docker
 Rename config-sample.yml to config.yml and set it before running
@@ -33,7 +31,7 @@ docker run -e TELEGRAM_BOT_KEY=YOUR_TELEGRAM_BOT_KEY -e LOOKARR_AUTH_PASSWORD=YO
 
 /auth <LOOKARR_AUTH_PASSWORD> is required when calling the bot the first time.
 
-Adding chat ids on the "strict_mode_allowed_ids" section within the config file enables "strict mode". This means the bot will stay silent if it's contacted by users which are not in the strict_mode_allowed_ids list and they won't be able to authenticate.
+Adding chat ids on the "strict_mode_allowed_ids" section within the config file enables "strict mode". This means the bot will stay silent if it's contacted by users which are not in the strict_mode_allowed_ids list, and they won't be able to authenticate.
 
 ## How to run locally
 Rename config-sample.yml to config.yml and set it before running
