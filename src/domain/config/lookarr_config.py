@@ -1,5 +1,6 @@
-from pydantic import validator
-from typing import TYPE_CHECKING
+from pydantic import field_validator
+from typing import TYPE_CHECKING, Literal
+
 if TYPE_CHECKING:
     from dataclasses import dataclass
 else:
@@ -10,7 +11,7 @@ from src.constants import SUPPORTED_LANGUAGES
 
 @dataclass
 class LookarrConfig:
-    language: str
+    language: SUPPORTED_LANGUAGES
     strict_mode_allowed_ids: list[int]
     search_all_command: str
     strict_mode: bool = False
@@ -18,8 +19,3 @@ class LookarrConfig:
     def __post_init__(self) -> None:
         self.strict_mode = True if len(self.strict_mode_allowed_ids) > 0 else False
 
-    @validator('language')
-    def language_not_null(cls, value):
-        if value not in SUPPORTED_LANGUAGES:
-            raise ValueError(f"value must be one of: {''.join(SUPPORTED_LANGUAGES)}")
-        return value.title()
