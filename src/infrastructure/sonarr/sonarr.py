@@ -102,7 +102,12 @@ class Sonarr(IMediaServerRepository):
         built_data = {
             "qualityProfileId": int(quality_profile_id),
             "rootFolderPath": path,
-            "addOptions": {"searchForMovie": True},
+            "addOptions": {
+                "ignoreEpisodesWithFiles": "true",
+                "ignoreEpisodesWithoutFiles": "false",
+                "searchForMissingEpisodes": "true",
+            },
+            "monitored": True,
             "languageProfileId": language_id,
             "seasons": seasons,
         }
