@@ -3,7 +3,7 @@
 user_config/config.yml
 .DS_Store
 .coverage
-*.log
+**/*.log
 user_config/lookar.db
 user_config/lookar.db.bak
 
@@ -239,3 +239,4 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 user_config/lookar.json
+log.txt
