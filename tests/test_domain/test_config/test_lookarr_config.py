@@ -1,4 +1,5 @@
 import pytest
+from pydantic import ValidationError
 
 from src.domain.config.lookarr_config import LookarrConfig
 from src.constants import SUPPORTED_LANGUAGES
@@ -33,12 +34,12 @@ class Test_LookarrConfig:
         expectedErrorMessage = f"value must be one of: {''.join(SUPPORTED_LANGUAGES)}"
 
         # Assert
-        with pytest.raises(ValueError) as result:
+        with pytest.raises(ValidationError) as result:
             LookarrConfig(
                 language="gibberish",
                 strict_mode_allowed_ids=[1, 2],
                 search_all_command="Search",
             )
 
-        errorMessage = result.value.args[0][0].exc.args[0]
-        assert errorMessage == expectedErrorMessage
+        errorMessage = result.value.errors()[0]["msg"]
+        assert expectedErrorMessage in errorMessage
