@@ -1,11 +1,4 @@
-from pydantic import field_validator
-from typing import TYPE_CHECKING, Literal
-
-if TYPE_CHECKING:
-    from dataclasses import dataclass
-else:
-    from pydantic.dataclasses import dataclass
-
+from dataclasses import dataclass
 from src.constants import SUPPORTED_LANGUAGES
 
 
