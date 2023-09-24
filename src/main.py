@@ -48,7 +48,6 @@ def main(
     application = Application.builder().token(os.getenv("TELEGRAM_BOT_KEY")).build()
 
     conversation_handler = ConversationHandler(
-        conversation_timeout=timedelta(minutes=15),
         per_user=True,
         allow_reentry=True,
         entry_points=[

@@ -1,14 +1,10 @@
-FROM python:3.9.18-slim as build
-
-WORKDIR /app
-
-COPY . /app
-
-RUN pip install --upgrade pip && pip install --no-cache-dir --target=/app/src -r requirements.txt
-
 FROM python:alpine3.18
 ENV PYTHONPATH=/app
 
-COPY --from=build /app/src ./app/src
+WORKDIR /app
+COPY requirements.txt ./src/requirements.txt
+RUN pip install --no-cache-dir -r ./src/requirements.txt
+
+COPY ./src ./src
 
 ENTRYPOINT ["python", "/app/src/main.py"]
