@@ -2,6 +2,6 @@ pydantic==2.3.0
 PyYAML==6.0.1
 dacite==1.8.1
 requests==2.31.0
-python-telegram-bot==20.5
+python-telegram-bot==20.6
 kink==0.6.7
 tinydb==4.8.0
